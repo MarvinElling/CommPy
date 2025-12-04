@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Typing :: Typed",
 ]
-description = "Convert Visio .vsdx to other file formats."
+description = "Python Library for Communication Engineering."
 dependencies = [
 
 ]
