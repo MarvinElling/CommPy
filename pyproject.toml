@@ -1,0 +1,136 @@
+[build-system]
+requires = ["setuptools>=68", "setuptools-scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "commpy"
+authors = [
+    {name = "Marvin Elling", email = "mane.der@web.de"},
+]
+version = "0.1.0"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+description = "Convert Visio .vsdx to other file formats."
+dependencies = [
+
+]
+keywords = [
+    "Communication",
+    "Information",
+    "Information Theory",
+    "Singal Processing",
+    "Engineering",
+    "AI",
+    "Machine Learning",
+    "Shannon",
+    "Entropy",
+]
+license = {text = "Apache 2.0"}
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/MarvinElling/CommPy"
+Iussues = "https://github.com/MarvinElling/CommPy/issues"
+
+[project.optional-dependencies]
+dev = [
+    "isort",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "yapf",
+]
+
+[tool.coverage]
+report.exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "if __name__ == '__main__':",
+]
+report.show_missing = true
+report.skip_covered = true
+run.branch = true
+run.source = ["src"]
+
+[tool.isort]
+combine_as_imports = true
+ensure_newline_before_comments = true
+include_trailing_comma = true
+line_length = 100
+multi_line_output = 3
+split_on_trailing_comma = true
+
+
+[tool.mypy]
+disallow_any_explicit = true
+explicit_package_bases = true
+fast_module_lookup = true
+mypy_path = "src"
+namespace_packages = true
+strict = true
+
+[[tool.mypy.overrides]]
+module = []
+ignore_missing_imports = true
+
+
+[tool.pydocstyle]
+convention = "google"
+add_select = ["D204", "D400", "D401", "D404", "D413"]
+
+
+[tool.pytest.ini_options]
+addopts = ["--cov", "--verbose"]
+
+
+[tool.ruff]
+select = [
+  "ALL",
+]
+ignore = [
+  "ANN101",
+  "ANN102",
+  "PLR2004",
+  "T201",
+  # allow asserts
+  "S101",
+  "INP001",
+]
+line-length = 100
+
+[tool.ruff.isort]
+combine-as-imports = true
+force-wrap-aliases = true
+known-first-party = ["MicEntraIdCleanup"]
+
+[tool.ruff.flake8-quotes]
+avoid-escape = false
+inline-quotes = "single"
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+
+[tool.setuptools_scm]
+
+
+[tool.yapf]
+based_on_style = "google"
+column_limit = 100
+allow_split_before_dict_value = false
+dedent_closing_brackets = true
+indent_dictionary_value = false
