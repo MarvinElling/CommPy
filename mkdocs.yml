@@ -1,0 +1,22 @@
+site_name: CommPy
+site_url: https://marvinelling.github.io/CommPy
+repo_name: MarvinElling/CommPy
+nav:
+  - Home: index.md
+  - Channel Coding: channelCoding.md
+theme:
+  name: material
+  palette:
+    primary: 'indigo'
+    accent: 'indigo'
+  font:
+    text: Roboto
+    code: Roboto Mono
+extra_css:
+  - 'assets/css/extra.css'
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
