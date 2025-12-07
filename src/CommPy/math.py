@@ -1,7 +1,7 @@
 from math import log2
 
 
-class formulas:
+class Formulas:
     """
     This module contains various formulas related to communication theory.
     """
