@@ -3,7 +3,7 @@
 Expose commonly used symbols at package level.
 """
 
-from ._utils.maths import is_prime
+from ._utils.maths import is_prime, modinv
 from .math import Formulas
 
 # Keep a backwards-compatible name `formulas` pointing to the class `Formulas`.
@@ -13,4 +13,5 @@ __all__ = [
     'Formulas',
     'formulas',
     'is_prime',
+    'modinv',
 ]
