@@ -24,13 +24,14 @@ classifiers = [
 ]
 description = "Python Library for Communication Engineering."
 dependencies = [
-
+  "numpy",
+  "matplotlib",
 ]
 keywords = [
     "Communication",
     "Information",
     "Information Theory",
-    "Singal Processing",
+    "Signal Processing",
     "Engineering",
     "AI",
     "Machine Learning",
