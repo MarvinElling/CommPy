@@ -1,17 +1,30 @@
-"""CommPy package init.
+"""commpy package init."""
 
-Expose commonly used symbols at package level.
-"""
-
+from ._channelCoding.channels import Channels
+from ._channelCoding.fields import PrimeField
+from ._channelCoding.modulation_analogCarrier_digitalData import (
+    ASK_2_Modulator,
+    ASK_4_Modulator,
+    BPSK_Modulator,
+    OOK_Modulator,
+    PSK_8_Modulator,
+    QPSK_Modulator,
+)
+from ._informationTheory.formulas import shannon_entropy
 from ._utils.maths import is_prime, modinv
-from .math import Formulas
-
-# Keep a backwards-compatible name `formulas` pointing to the class `Formulas`.
-formulas = Formulas
+from ._waves.iq_wave import IQWaveform
 
 __all__ = [
-    'Formulas',
-    'formulas',
+    'ASK_2_Modulator',
+    'ASK_4_Modulator',
+    'BPSK_Modulator',
+    'Channels',
+    'IQWaveform',
+    'OOK_Modulator',
+    'PSK_8_Modulator',
+    'PrimeField',
+    'QPSK_Modulator',
     'is_prime',
     'modinv',
+    'shannon_entropy',
 ]

@@ -1,20 +1,33 @@
-# %%
+"""IQWaveform class for generating and plotting IQ modulated waveforms."""
+
+from collections.abc import Callable, Sequence
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 class IQWaveform:
+    """Class for generating and plotting IQ modulated waveforms."""
 
-    def __init__(self, I, Q, T, fs, f0=0.0, pulse_shape=None, span=4):
-        """Initialize IQ Waveform.
-
-        Parameters:
-        - I, Q: arrays of symbols (real numbers, usually from modulation, e.g. I = syms.real, Q = syms.imag)
+    def __init__(
+        self,
+        I: Sequence[float],             # or np.ndarray
+        Q: Sequence[float],             # or np.ndarray
+        T: float,
+        fs: float,
+        f0: float = 0.0,
+        pulse_shape: Callable[[np.ndarray], np.ndarray] | None = None,
+        span: int = 4,
+    ) -> None:
+        """Parameters:
+        - I, Q: arrays of symbols (real numbers, usually from modulation, e.g.
+            I = syms.real, Q = syms.imag)
         - T: symbol period (seconds)
         - fs: sample rate (Hz)
         - f0: carrier frequency (Hz). If 0, output baseband only.
         - pulse_shape: function(tau) returning g_s(tau). Default: rect pulse.
-        - span: Pulse truncation window in multiples of T (for computational efficiency; e.g. 4)
+        - span: Pulse truncation window in multiples of T (for computational
+            efficiency; e.g. 4)
         """
         self.I = np.asarray(I)
         self.Q = np.asarray(Q)
@@ -22,7 +35,7 @@ class IQWaveform:
         self.fs = fs
         self.f0 = f0
         self.span = span
-        self.N = len(I)
+        self.N = len(self.I)
         if pulse_shape is None:
             self.pulse_shape = lambda tau: ((tau >= 0) & (tau < T)).astype(float)
         else:
