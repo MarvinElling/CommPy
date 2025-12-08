@@ -110,6 +110,159 @@ class Channels:
             noise = sigma * rng.normal(size=x_arr.shape)
 
         return x_arr + noise
+    
+    @staticmethod
+    def rayleigh(x: Any, snr_db: float, rng: Optional[np.random.Generator] = None) -> np.ndarray:
+        """
+        Rayleigh fading channel + AWGN.
+
+        Parameters
+        - x: Input signal (array-like, real or complex).
+        - snr_db: Desired SNR in dB.
+        - rng: Optional random generator.
+
+        Returns
+        - Output after Rayleigh fading and AWGN.
+        """
+        x_arr = np.asarray(x)
+        if rng is None:
+            rng = np.random.default_rng()
+        
+        # Rayleigh coefficients (can be complex or real)
+        if np.iscomplexobj(x_arr):
+            h = (rng.normal(size=x_arr.shape) + 1j * rng.normal(size=x_arr.shape))/np.sqrt(2)
+        else:
+            h = rng.rayleigh(scale=1.0, size=x_arr.shape)
+        
+        faded = x_arr * h
+        return Channels.awgn(faded, snr_db, rng)
+    
+    @staticmethod
+    def rician(x: Any, snr_db: float, K: float = 10.0, rng: Optional[np.random.Generator] = None) -> np.ndarray:
+        """
+        Rician fading channel + AWGN.
+
+        Parameters
+        - x: Input signal (array-like, real or complex).
+        - snr_db: desired SNR in dB.
+        - K: Rician K-factor (power ratio of LOS to scattered).
+        - rng: Optional random generator.
+
+        Returns
+        - Output after Rician fading and AWGN.
+        """
+        x_arr = np.asarray(x)
+        if rng is None:
+            rng = np.random.default_rng()
+        
+        # Rician fading: specular (LOS) + scattered
+        # K-factor: ratio of direct/single path to scatter power (linear)
+        K_lin = float(K)
+        s = np.sqrt(K_lin / (K_lin + 1))
+        sigma = np.sqrt(1 / (2 * (K_lin + 1)))
+
+        if np.iscomplexobj(x_arr):
+            h = s + sigma * (rng.normal(size=x_arr.shape) + 1j * rng.normal(size=x_arr.shape))
+        else:
+            h = s + sigma * rng.normal(size=x_arr.shape)
+        
+        faded = x_arr * h
+        return Channels.awgn(faded, snr_db, rng)
+
+    @staticmethod
+    def z_channel(bits: Any, p: float, rng: Optional[np.random.Generator] = None) -> np.ndarray:
+        """
+        Z-Channel.
+
+        Flips 1 to 0 with probability p. 0 stays 0 always.
+
+        Parameters
+        - bits: array-like (0/1 or bool)
+        - p: error probability for 1→0.
+        - rng: random generator.
+
+        Returns
+        - ndarray of same shape.
+        """
+        bits_arr = np.asarray(bits)
+        if rng is None:
+            rng = np.random.default_rng()
+        flips = (bits_arr == 1) & (rng.random(bits_arr.shape) < p)
+        out = bits_arr.copy()
+        out[flips] = 0
+        return out
+    
+    @staticmethod
+    def gilbert_elliott(
+        bits: Any,
+        p_gb: float,
+        p_bg: float,
+        p_good: float = 0.0,
+        p_bad: float = 0.2,
+        rng: Optional[np.random.Generator] = None,
+        init_state: str = "good",
+    ) -> np.ndarray:
+        """
+        Gilbert-Elliott two-state bursty channel.
+
+        Parameters
+        - bits: input bits array-like (0/1 or bool)
+        - p_gb: prob. to switch Good->Bad
+        - p_bg: prob. to switch Bad->Good
+        - p_good: error of 'good' state
+        - p_bad: error of 'bad' state
+        - rng: random number generator
+        - init_state: "good" or "bad"
+
+        Returns
+        - output bits (ndarray)
+        """
+        bits_arr = np.asarray(bits)
+        if rng is None:
+            rng = np.random.default_rng()
+        N = bits_arr.size
+
+        state = 0 if init_state == "good" else 1
+        states = np.zeros(N, dtype=int)
+        for i in range(1, N):
+            if state == 0 and rng.random() < p_gb:
+                state = 1
+            elif state == 1 and rng.random() < p_bg:
+                state = 0
+            states[i] = state
+
+        errors = np.where(states == 0,
+                          rng.random(N) < p_good,
+                          rng.random(N) < p_bad)
+        if bits_arr.dtype == bool:
+            return np.logical_xor(bits_arr, errors)
+        out = bits_arr.copy()
+        out = np.where(errors, 1 - out, out)
+        return out
+    
+    @staticmethod
+    def quantize(x: Any, bits: int = 8, vmin: Optional[float] = None, vmax: Optional[float] = None) -> np.ndarray:
+        """
+        Uniform quantization of an analog signal.
+
+        Parameters
+        - x: input real signal
+        - bits: number of quantization bits
+        - vmin, vmax: optional min/max for clipping range
+
+        Returns:
+        - quantized signal
+        """
+        x_arr = np.asarray(x)
+        if vmin is None:
+            vmin = np.min(x_arr)
+        if vmax is None:
+            vmax = np.max(x_arr)
+        levels = 2 ** bits
+        x_clipped = np.clip(x_arr, vmin, vmax)
+        q = np.round((x_clipped - vmin) / (vmax - vmin) * (levels - 1))
+        xq = vmin + q / (levels - 1) * (vmax - vmin)
+        return xq
 
 
 __all__ = ["Channels"]
