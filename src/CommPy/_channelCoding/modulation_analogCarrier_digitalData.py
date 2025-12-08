@@ -80,7 +80,7 @@ class ASK_2_Modulator:
         """
         return np.array(
             [(amplitudes[1] if bit == 1 else amplitudes[0]) for bit in bitstream],
-            dtype=np.complex128
+            dtype=np.complex128,
         )
 
     @staticmethod
@@ -114,7 +114,7 @@ class ASK_4_Modulator:
         """
         return np.array(
             [amplitudes[int(''.join(map(str, bit)), 2)] for bit in np.reshape(bitstream, (-1, 2))],
-            dtype=np.complex128
+            dtype=np.complex128,
         )
 
     @staticmethod

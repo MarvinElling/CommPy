@@ -49,7 +49,7 @@ class Channels:
         bits: Any,
         p: float,
         erasure_value: Any = -1,
-        rng: np.random.Generator | None = None
+        rng: np.random.Generator | None = None,
     ) -> np.ndarray:
         """Binary Erasure Channel (BEC).
 
@@ -147,7 +147,7 @@ class Channels:
         x: Any,
         snr_db: float,
         K: float = 10.0,
-        rng: np.random.Generator | None = None
+        rng: np.random.Generator | None = None,
     ) -> np.ndarray:
         """Rician fading channel + AWGN.
 
@@ -247,7 +247,10 @@ class Channels:
 
     @staticmethod
     def quantize(
-        x: Any, bits: int = 8, vmin: float | None = None, vmax: float | None = None
+        x: Any,
+        bits: int = 8,
+        vmin: float | None = None,
+        vmax: float | None = None,
     ) -> np.ndarray:
         """Uniform quantization of an analog signal.
 
