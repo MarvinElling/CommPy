@@ -9,6 +9,6 @@ from .math import Formulas
 formulas = Formulas
 
 __all__ = [
-    "Formulas",
-    "formulas",
+    'Formulas',
+    'formulas',
 ]

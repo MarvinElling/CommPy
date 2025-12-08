@@ -1,17 +1,14 @@
-# %%
 import numpy as np
 
 
 class OOK_Modulator:
-    """
-    On-Off Keying (OOK) modulation class.
+    """On-Off Keying (OOK) modulation class.
     This class provides methods to modulate and demodulate binary data using OOK.
     """
 
     @staticmethod
     def modulate(data, amplitude=1):
-        """
-        Modulates binary data using OOK.
+        """Modulates binary data using OOK.
 
         Parameters:
         data (list): Binary data to be modulated (0s and 1s).
@@ -24,8 +21,7 @@ class OOK_Modulator:
 
     @staticmethod
     def demodulate(signal, threshold=0.5):
-        """
-        Demodulates an OOK signal back to binary data.
+        """Demodulates an OOK signal back to binary data.
 
         Parameters:
         signal (list): OOK modulated signal.
@@ -34,19 +30,17 @@ class OOK_Modulator:
         Returns:
         list: Demodulated binary data.
         """
-        return [1+0j if sample >= threshold else 0 for sample in signal]
+        return [1 + 0j if sample >= threshold else 0 for sample in signal]
 
 
 class BPSK_Modulator:
-    """
-    Binary Phase Shift Keying (BPSK) modulation class.
+    """Binary Phase Shift Keying (BPSK) modulation class.
     This class provides methods to modulate and demodulate binary data using BPSK.
     """
 
     @staticmethod
     def modulate(bitstream):
-        """
-        Modulates binary data using BPSK.
+        """Modulates binary data using BPSK.
 
         Parameters:
         data (list): Binary data to be modulated (0s and 1s).
@@ -54,12 +48,11 @@ class BPSK_Modulator:
         Returns:
         list: Modulated signal.
         """
-        return np.array([(1+0j) if bit == 1 else (-1+0j) for bit in bitstream])
+        return np.array([(1 + 0j) if bit == 1 else (-1 + 0j) for bit in bitstream])
 
     @staticmethod
     def demodulate(signal, threshold=0):
-        """
-        Demodulates a BPSK signal back to binary data.
+        """Demodulates a BPSK signal back to binary data.
 
         Parameters:
         signal (list): BPSK modulated signal.
@@ -71,14 +64,12 @@ class BPSK_Modulator:
 
 
 class ASK_2_Modulator:
-    """
-    Amplitude Shift Keying (ASK) modulation class.
+    """Amplitude Shift Keying (ASK) modulation class.
     """
 
     @staticmethod
     def modulate(bitstream, amplitudes=[-1, 1]):
-        """
-        Modulates binary data using ASK.
+        """Modulates binary data using ASK.
 
         Parameters:
         bitstream (list): Binary data to be modulated (0s and 1s).
@@ -87,12 +78,14 @@ class ASK_2_Modulator:
         Returns:
         list: Modulated signal.
         """
-        return np.array([(amplitudes[1] if bit == 1 else amplitudes[0]) for bit in bitstream], dtype=np.complex128)
-        
+        return np.array(
+            [(amplitudes[1] if bit == 1 else amplitudes[0]) for bit in bitstream],
+            dtype=np.complex128
+        )
+
     @staticmethod
     def demodulate(signal, threshold=0):
-        """
-        Demodulates an ASK signal back to binary data.
+        """Demodulates an ASK signal back to binary data.
 
         Parameters:
         signal (list): ASK modulated signal.
@@ -102,17 +95,15 @@ class ASK_2_Modulator:
         list: Demodulated binary data.
         """
         return np.array([1 if sample.real >= threshold else 0 for sample in signal])
-    
+
 
 class ASK_4_Modulator:
-    """
-    4-Level Amplitude Shift Keying (ASK) modulation class.
+    """4-Level Amplitude Shift Keying (ASK) modulation class.
     """
 
     @staticmethod
     def modulate(bitstream, amplitudes=[-3, -1, 1, 3]):
-        """
-        Modulates binary data using 4-level ASK.
+        """Modulates binary data using 4-level ASK.
 
         Parameters:
         bitstream (list): Binary data to be modulated (0s and 1s).
@@ -121,12 +112,14 @@ class ASK_4_Modulator:
         Returns:
         list: Modulated signal.
         """
-        return np.array([amplitudes[int(''.join(map(str, bit)), 2)] for bit in np.reshape(bitstream, (-1, 2))], dtype=np.complex128)
-        
+        return np.array(
+            [amplitudes[int(''.join(map(str, bit)), 2)] for bit in np.reshape(bitstream, (-1, 2))],
+            dtype=np.complex128
+        )
+
     @staticmethod
     def demodulate(signal, levels=[-3, -1, 1, 3]):
-        """
-        Demodulates a 4-level ASK signal back to binary data.
+        """Demodulates a 4-level ASK signal back to binary data.
 
         Parameters:
         signal (list): 4-level ASK modulated signal.
@@ -135,18 +128,16 @@ class ASK_4_Modulator:
         list: Demodulated binary data.
         """
         return np.array([format(levels.index(int(sample.real)), '02b') for sample in signal])
-    
+
 
 class QPSK_Modulator:
-    """
-    Quadrature Phase Shift Keying (QPSK) modulation class.
+    """Quadrature Phase Shift Keying (QPSK) modulation class.
     This class provides methods to modulate and demodulate binary data using QPSK.
     """
 
     @staticmethod
     def modulate(bitstream, amplitude=1):
-        """
-        Modulates binary data using QPSK.
+        """Modulates binary data using QPSK.
 
         Parameters:
         bitstream (list): Binary data to be modulated (0s and 1s).
@@ -155,11 +146,11 @@ class QPSK_Modulator:
         list: Modulated signal.
         """
         if len(bitstream) % 2 != 0:
-            raise ValueError("Bitstream length must be even for QPSK modulation.")
-        
+            raise ValueError('Bitstream length must be even for QPSK modulation.')
+
         symbols = []
         for i in range(0, len(bitstream), 2):
-            bit_pair = bitstream[i:i+2]
+            bit_pair = bitstream[i:i + 2]
             if bit_pair == [0, 0]:
                 symbols.append(complex(amplitude, 0))  # 0 degrees
             elif bit_pair == [0, 1]:
@@ -168,13 +159,12 @@ class QPSK_Modulator:
                 symbols.append(complex(-amplitude, 0))  # 180 degrees
             elif bit_pair == [1, 1]:
                 symbols.append(complex(0, -amplitude))  # 270 degrees
-        
+
         return np.array(symbols, dtype=np.complex128)
-    
+
     @staticmethod
     def demodulate(signal, amplitude=1):
-        """
-        Demodulates a QPSK signal back to binary data.
+        """Demodulates a QPSK signal back to binary data.
 
         Parameters:
         signal (list): QPSK modulated signal.
@@ -192,20 +182,18 @@ class QPSK_Modulator:
                 bitstream.extend([1, 0])  # 180 degrees
             elif sample.real >= 0 and sample.imag < 0:
                 bitstream.extend([1, 1])  # 270 degrees
-        
+
         return np.array(bitstream)
-    
+
 
 class PSK_8_Modulator:
-    """
-    8-Phase Shift Keying (PSK) modulation class.
+    """8-Phase Shift Keying (PSK) modulation class.
     This class provides methods to modulate and demodulate binary data using 8-PSK.
     """
 
     @staticmethod
     def modulate(bitstream, amplitude=1):
-        """
-        Modulates binary data using 8-PSK.
+        """Modulates binary data using 8-PSK.
 
         Parameters:
         bitstream (list): Binary data to be modulated (0s and 1s).
@@ -214,21 +202,20 @@ class PSK_8_Modulator:
         list: Modulated signal.
         """
         if len(bitstream) % 3 != 0:
-            raise ValueError("Bitstream length must be a multiple of 3 for 8-PSK modulation.")
-        
+            raise ValueError('Bitstream length must be a multiple of 3 for 8-PSK modulation.')
+
         symbols = []
         for i in range(0, len(bitstream), 3):
-            bit_triplet = bitstream[i:i+3]
+            bit_triplet = bitstream[i:i + 3]
             index = int(''.join(map(str, bit_triplet)), 2)
             angle = (index * np.pi / 4)  # 45 degrees per symbol
             symbols.append(complex(amplitude * np.cos(angle), amplitude * np.sin(angle)))
-        
+
         return np.array(symbols, dtype=np.complex128)
-    
+
     @staticmethod
     def demodulate(signal, amplitude=1):
-        """
-        Demodulates an 8-PSK signal back to binary data.
+        """Demodulates an 8-PSK signal back to binary data.
 
         Parameters:
         signal (list): 8-PSK modulated signal.
@@ -241,37 +228,5 @@ class PSK_8_Modulator:
             angle = np.angle(sample) % (2 * np.pi)
             index = int(round(angle / (np.pi / 4))) % 8
             bitstream.extend(format(index, '03b'))  # Convert index to 3-bit binary
-        
+
         return np.array(bitstream)
-
-
-if __name__ == "__main__":
-    # Example usage of OOK Modulator
-    bits = [0, 1, 1, 0, 1, 1]
-    modulated_signal = OOK_Modulator.modulate(bits)
-    print("OOK Modulated Signal:", modulated_signal)
-
-    demodulated_bits = OOK_Modulator.demodulate(modulated_signal)
-    print("Demodulated Bits:", demodulated_bits)
-
-    # Example usage of BPSK Modulator
-    bpsk_signal = BPSK_Modulator.modulate(bits)
-    print("BPSK Modulated Signal:", bpsk_signal)
-
-    bpsk_demodulated = BPSK_Modulator.demodulate(bpsk_signal)
-    print("BPSK Demodulated Bits:", bpsk_demodulated)
-    
-    # Example usage of ASK_2 Modulator
-    ask_2_signal = ASK_2_Modulator.modulate(bits)
-    print("ASK_2 Modulated Signal:", ask_2_signal)
-
-    ask_2_demodulated = ASK_2_Modulator.demodulate(ask_2_signal)
-    print("ASK_2 Demodulated Bits:", ask_2_demodulated)
-    
-    # Example usage of ASK_4 Modulator
-    bits_4 = [0, 0, 0, 1, 1, 0, 1, 1]  # Example for 4-level ASK
-    ask_4_signal = ASK_4_Modulator.modulate(bits_4)
-    print("ASK_4 Modulated Signal:", ask_4_signal)
-
-    ask_4_demodulated = ASK_4_Modulator.demodulate(ask_4_signal)
-    print("ASK_4 Demodulated Bits:", ask_4_demodulated)

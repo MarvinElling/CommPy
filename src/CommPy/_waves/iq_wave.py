@@ -1,11 +1,12 @@
 # %%
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 class IQWaveform:
+
     def __init__(self, I, Q, T, fs, f0=0.0, pulse_shape=None, span=4):
-        """
-        Initialize IQ Waveform.
+        """Initialize IQ Waveform.
 
         Parameters:
         - I, Q: arrays of symbols (real numbers, usually from modulation, e.g. I = syms.real, Q = syms.imag)
@@ -59,23 +60,23 @@ class IQWaveform:
 
     def plot_waveform(self):
         """Plot the analog transmit signal \tilde{S}(t)."""
-        plt.figure(figsize=(10,3))
+        plt.figure(figsize=(10, 3))
         plt.plot(self.t, self.s, lw=1.2)
-        plt.xlabel("t [s]")
-        plt.ylabel("$\\tilde{S}(t)$")
-        plt.title("Bandpass IQ Modulated Signal")
+        plt.xlabel('t [s]')
+        plt.ylabel('$\\tilde{S}(t)$')
+        plt.title('Bandpass IQ Modulated Signal')
         plt.grid(True)
         plt.tight_layout()
         plt.show()
 
     def plot_IQ_baseband(self):
         """Plot baseband I/Q components as a function of time."""
-        plt.figure(figsize=(10,4))
+        plt.figure(figsize=(10, 4))
         plt.plot(self.t, self.s_I, label='I(t)', lw=1.2)
         plt.plot(self.t, self.s_Q, label='Q(t)', lw=1.2)
-        plt.xlabel("t [s]")
-        plt.ylabel("Amplitude")
-        plt.title("Baseband I/Q Components (Pulse Shaped)")
+        plt.xlabel('t [s]')
+        plt.ylabel('Amplitude')
+        plt.title('Baseband I/Q Components (Pulse Shaped)')
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
@@ -85,20 +86,22 @@ class IQWaveform:
         """Plot eye diagram for I(t)."""
         period = int(self.T * self.fs)
         plt.figure()
-        for k in range(len(self.s_I)//period - N):
-            plt.plot(np.arange(period)/self.fs, self.s_I[k*period:(k+1)*period], 'b')
-        plt.xlabel("t [symbol period]")
+        for k in range(len(self.s_I) // period - N):
+            plt.plot(np.arange(period) / self.fs, self.s_I[k * period:(k + 1) * period], 'b')
+        plt.xlabel('t [symbol period]')
         plt.title('Eye diagram (I)')
         plt.grid(True)
         plt.tight_layout()
         plt.show()
 
     # You can add spectrum plotting or save-to-file as needed.
+
+
 # %%
 # Example usage:
-if __name__ == "__main__":
+if __name__ == '__main__':
     from CommPy.channelCoding.modulation import OOK
-    bits = np.random.randint(0,2, 16)
+    bits = np.random.randint(0, 2, 16)
     syms = OOK.modulate(bits)
     I = syms.real
     Q = syms.imag
@@ -106,7 +109,7 @@ if __name__ == "__main__":
     fs = 300000
     f0 = 20000
 
-    tx = IQWaveform(I, Q, T, fs, f0)   # Default: rectangular pulse
+    tx = IQWaveform(I, Q, T, fs, f0)  # Default: rectangular pulse
     tx.plot_waveform()
     tx.plot_IQ_baseband()
     tx.plot_eye()

@@ -1,10 +1,11 @@
 import os
 import sys
+
 import numpy as np
 
 # Ensure the package in `src/` is importable when running tests from the repo root
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-SRC = os.path.join(ROOT, "src")
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+SRC = os.path.join(ROOT, 'src')
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
 
@@ -35,7 +36,7 @@ def test_awgn():
     snr_db = 10.0
     y = Channels.awgn(x, snr_db, rng=rng)
     noise = y - x
-    signal_power = np.mean(x ** 2)
-    noise_power = np.mean(noise ** 2)
+    signal_power = np.mean(x**2)
+    noise_power = np.mean(noise**2)
     snr_est = 10 * np.log10(signal_power / noise_power)
     assert abs(snr_est - snr_db) < 0.25
