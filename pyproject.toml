@@ -8,7 +8,7 @@ name = "commpy"
 authors = [
     {name = "Marvin Elling", email = "mane.der@web.de"},
 ]
-version = "0.1.1"
+version = "0.1.2"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: Apache Software License",
