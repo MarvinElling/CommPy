@@ -587,7 +587,7 @@ See [CONTRIBUTING.md#code-style](https://github.com/MarvinElling/CommPy/blob/mai
 - **API Reference**: [API.md](API.md)
 - **User Guide**: [USER_GUIDE.md](USER_GUIDE.md)
 - **Quick Reference**: [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
-- **Documentation Index**: [INDEX.md](INDEX.md)
+- **Documentation Index**: [index.md](index.md)
 
 Can't find answer? Open an issue on GitHub!
 

@@ -88,7 +88,7 @@ earlier package rename are fixed as part of this release.
   - Pull request process
   - Code review guidelines
 
-- **Documentation Index** (`docs/INDEX.md`)
+- **Documentation Index** (`docs/index.md`)
   - Quick navigation guide
   - Learning paths for different user types
   - Document organization
@@ -109,7 +109,7 @@ CommPy/
 ├── README.md              # Overview and quick start
 ├── CONTRIBUTING.md        # Contribution guidelines
 ├── docs/
-│   ├── INDEX.md          # Documentation index and navigation
+│   ├── index.md          # Documentation index and navigation
 │   ├── API.md            # Complete API reference
 │   ├── GETTING_STARTED.md # Beginner tutorials
 │   ├── USER_GUIDE.md     # Comprehensive user guide
@@ -170,7 +170,7 @@ If upgrading from 0.1.1, new documentation is fully backward compatible with exi
 **No breaking changes** - all code from 0.1.1 works as-is in 0.1.2.
 
 ### Starting with 0.1.2
-Read [docs/INDEX.md](INDEX.md) to find the best starting point for your needs.
+Read [docs/index.md](index.md) to find the best starting point for your needs.
 
 ---
 
@@ -220,7 +220,7 @@ Please open an issue if you find gaps!
 
 ## Questions About Changes?
 
-- Check [docs/INDEX.md](INDEX.md) for navigation help
+- Check [docs/index.md](index.md) for navigation help
 - Review specific documentation files for detailed information
 - Open an issue on GitHub for clarifications
 - See [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) for dev questions

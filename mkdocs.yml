@@ -4,7 +4,7 @@ repo_name: MarvinElling/CommPy
 repo_url: https://github.com/MarvinElling/CommPy
 
 nav:
-  - Home: INDEX.md
+  - Home: index.md
   - Getting Started: GETTING_STARTED.md
   - User Guide: USER_GUIDE.md
   - API Reference: API.md
