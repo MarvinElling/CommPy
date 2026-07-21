@@ -12,7 +12,7 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 
 ### For Developers
 1. **API Reference**: [API.md](API.md)
-2. **Contributing**: [CONTRIBUTING.md](../CONTRIBUTING.md)
+2. **Contributing**: [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md)
 3. **Module structure**: Check `src/commpy/` directory
 4. **Testing**: `tests/` directory
 
@@ -26,7 +26,7 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 | Generate waveforms | [USER_GUIDE.md](USER_GUIDE.md) | Waveform Generation |
 | Find function details | [API.md](API.md) | Use Ctrl+F to search |
 | Measure BER | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 2 |
-| Contribute code | [CONTRIBUTING.md](../CONTRIBUTING.md) | Development Guidelines |
+| Contribute code | [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) | Development Guidelines |
 | Error correction (FEC) | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorials 7-8 |
 | Generic M-QAM/M-PSK + soft demod | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 9 |
 | OFDM | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 10 |
@@ -40,7 +40,7 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 
 ### 📖 Main Documentation
 
-#### [README.md](../README.md)
+#### [README.md](https://github.com/MarvinElling/CommPy/blob/main/README.md)
 **Purpose:** Overview and quick start
 **Contains:**
 - Feature summary
@@ -137,7 +137,7 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 
 ---
 
-#### [CONTRIBUTING.md](../CONTRIBUTING.md)
+#### [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md)
 **Purpose:** Guide for contributors
 **Contains:**
 - Setup instructions
@@ -160,7 +160,7 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 ## Learning Paths
 
 ### Path 1: "I Want to Get Started Quickly"
-1. Read: [README.md](../README.md) - Overview (5 min)
+1. Read: [README.md](https://github.com/MarvinElling/CommPy/blob/main/README.md) - Overview (5 min)
 2. Install CommPy (2 min)
 3. Read: [GETTING_STARTED.md](GETTING_STARTED.md) - Quick Start (10 min)
 4. Run: Tutorial 1 - Basic modulation (10 min)
@@ -182,7 +182,7 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 ---
 
 ### Path 3: "I Want to Use CommPy for Research"
-1. Read: [README.md](../README.md) (5 min)
+1. Read: [README.md](https://github.com/MarvinElling/CommPy/blob/main/README.md) (5 min)
 2. Read: [USER_GUIDE.md](USER_GUIDE.md) - All sections (2 hours)
 3. Read: [API.md](API.md) - Reference your specific modules (30 min)
 4. Create simulation script using patterns from [USER_GUIDE.md](USER_GUIDE.md) (1 hour)
@@ -193,9 +193,9 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 ---
 
 ### Path 4: "I Want to Contribute Code"
-1. Read: [CONTRIBUTING.md](../CONTRIBUTING.md) - Full document (30 min)
+1. Read: [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) - Full document (30 min)
 2. Set up development environment (15 min)
-3. Read: [README.md](../README.md) - Module structure (10 min)
+3. Read: [README.md](https://github.com/MarvinElling/CommPy/blob/main/README.md) - Module structure (10 min)
 4. Explore: `/src/commpy/` source code (30 min)
 5. Start contributing! (varies)
 
@@ -208,13 +208,13 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 ### By Topic
 
 **Modulation:**
-- Overview: [README.md](../README.md#modulation)
+- Overview: [README.md](https://github.com/MarvinElling/CommPy/blob/main/README.md)
 - Tutorial: [GETTING_STARTED.md](GETTING_STARTED.md) Tutorial 1
 - Deep dive: [USER_GUIDE.md](USER_GUIDE.md) - Modulation section
 - API: [API.md](API.md) - Modulation classes
 
 **Channels:**
-- Overview: [README.md](../README.md#channel-simulation)
+- Overview: [README.md](https://github.com/MarvinElling/CommPy/blob/main/README.md)
 - Tutorial: [GETTING_STARTED.md](GETTING_STARTED.md) Tutorial 3
 - Deep dive: [USER_GUIDE.md](USER_GUIDE.md) - Channel Models section
 - API: [API.md](API.md) - Channels class
@@ -232,11 +232,11 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 **Best Practices:**
 - Quick tips: [GETTING_STARTED.md](GETTING_STARTED.md) - Common Patterns
 - Detailed guide: [USER_GUIDE.md](USER_GUIDE.md) - Best Practices
-- Code standards: [CONTRIBUTING.md](../CONTRIBUTING.md) - Code Style
+- Code standards: [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) - Code Style
 
 **Type Hints & Docstrings:**
-- Examples: [CONTRIBUTING.md](../CONTRIBUTING.md) - Documentation section
-- Code style: [CONTRIBUTING.md](../CONTRIBUTING.md) - Code Style section
+- Examples: [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) - Documentation section
+- Code style: [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) - Code Style section
 
 ---
 
@@ -270,16 +270,16 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 ### Documentation Not Clear?
 1. Check [GETTING_STARTED.md](GETTING_STARTED.md) - Troubleshooting section
 2. Search [API.md](API.md) for specific function details
-3. Look at example in [README.md](../README.md)
+3. Look at example in [README.md](https://github.com/MarvinElling/CommPy/blob/main/README.md)
 4. Open GitHub issue with question
 
 ### Want to Report a Bug?
 1. Check [GETTING_STARTED.md](GETTING_STARTED.md) - Troubleshooting
 2. Search existing GitHub issues
-3. Create new issue with details from [CONTRIBUTING.md](../CONTRIBUTING.md) - Reporting section
+3. Create new issue with details from [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) - Reporting section
 
 ### Want to Contribute?
-Start with [CONTRIBUTING.md](../CONTRIBUTING.md) - Getting Started section
+Start with [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) - Getting Started section
 
 ---
 

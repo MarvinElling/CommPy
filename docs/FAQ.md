@@ -137,7 +137,7 @@ See [USER_GUIDE.md](USER_GUIDE.md) for details.
 
 1. Implement modulate/demodulate methods
 2. Return complex numpy array from modulate
-3. See [CONTRIBUTING.md](CONTRIBUTING.md) for adding to CommPy
+3. See [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) for adding to CommPy
 
 Example structure:
 
@@ -546,7 +546,7 @@ wf.plot_waveform()  # Shows automatically
 
 ### Q: How do I report a bug?
 
-**A:** See [CONTRIBUTING.md#reporting-issues](../CONTRIBUTING.md#reporting-issues).
+**A:** See [CONTRIBUTING.md#reporting-issues](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md#reporting-issues).
 
 Include:
 1. **Title**: Clear description
@@ -558,7 +558,7 @@ Include:
 
 ### Q: How do I contribute code?
 
-**A:** See [CONTRIBUTING.md#getting-started](../CONTRIBUTING.md#getting-started).
+**A:** See [CONTRIBUTING.md#getting-started](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md#getting-started).
 
 Steps:
 1. Fork repository
@@ -577,7 +577,7 @@ Steps:
 - Type hints on all functions
 - Comprehensive docstrings
 
-See [CONTRIBUTING.md#code-style](../CONTRIBUTING.md#code-style).
+See [CONTRIBUTING.md#code-style](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md#code-style).
 
 ---
 

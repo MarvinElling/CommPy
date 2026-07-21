@@ -170,7 +170,7 @@ If upgrading from 0.1.1, new documentation is fully backward compatible with exi
 **No breaking changes** - all code from 0.1.1 works as-is in 0.1.2.
 
 ### Starting with 0.1.2
-Read [docs/INDEX.md](docs/INDEX.md) to find the best starting point for your needs.
+Read [docs/INDEX.md](INDEX.md) to find the best starting point for your needs.
 
 ---
 
@@ -185,7 +185,7 @@ All documentation follows these standards:
 - Cross-references to related topics
 
 ### Adding to Documentation
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+See [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) for guidelines on:
 - Code documentation style
 - Example standards
 - API documentation format
@@ -220,10 +220,10 @@ Please open an issue if you find gaps!
 
 ## Questions About Changes?
 
-- Check [docs/INDEX.md](docs/INDEX.md) for navigation help
+- Check [docs/INDEX.md](INDEX.md) for navigation help
 - Review specific documentation files for detailed information
 - Open an issue on GitHub for clarifications
-- See [CONTRIBUTING.md](CONTRIBUTING.md) for dev questions
+- See [CONTRIBUTING.md](https://github.com/MarvinElling/CommPy/blob/main/CONTRIBUTING.md) for dev questions
 
 ---
 
