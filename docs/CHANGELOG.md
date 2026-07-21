@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.0] - Current Release
+## [1.0.0] - 2026-07-21
 
 A major expansion from a small modulation/channel-model library into a
 comprehensive communications-engineering toolkit. No breaking changes to the
@@ -237,5 +237,5 @@ Documentation created with focus on:
 
 ---
 
-*Last updated: March 2026*
+*Last updated: July 2026*
 

@@ -1,3 +1,7 @@
+[![PyPI version](https://img.shields.io/pypi/v/commpy.svg)](https://pypi.org/project/commpy/)
+[![Python versions](https://img.shields.io/pypi/pyversions/commpy.svg)](https://pypi.org/project/commpy/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![CI](https://github.com/MarvinElling/CommPy/actions/workflows/ci.yml/badge.svg)](https://github.com/MarvinElling/CommPy/actions/workflows/ci.yml)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/commpy?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/commpy)
 
 # CommPy
@@ -40,7 +44,7 @@ pip install commpy[fast]
 Or install from source:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/MarvinElling/CommPy.git
 cd CommPy
 pip install -e ".[dev]"
 ```

@@ -1,0 +1,25 @@
+site_name: CommPy
+site_url: https://marvinelling.github.io/CommPy/
+repo_name: MarvinElling/CommPy
+repo_url: https://github.com/MarvinElling/CommPy
+
+nav:
+  - Home: INDEX.md
+  - Getting Started: GETTING_STARTED.md
+  - User Guide: USER_GUIDE.md
+  - API Reference: API.md
+  - Quick Reference: QUICK_REFERENCE.md
+  - FAQ: FAQ.md
+  - Changelog: CHANGELOG.md
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.superfences

@@ -11,15 +11,19 @@ authors = [
 version = "1.0.0"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
-    "Operating System :: POSIX :: Linux",
+    "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Communications",
     "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Information Analysis",
     "Typing :: Typed",
 ]
 description = "Python Library for Communication Engineering."
@@ -34,8 +38,11 @@ keywords = [
     "Information Theory",
     "Signal Processing",
     "Engineering",
-    "AI",
-    "Machine Learning",
+    "Channel Coding",
+    "Modulation",
+    "OFDM",
+    "Error Correction",
+    "DSP",
     "Shannon",
     "Entropy",
 ]
@@ -45,7 +52,10 @@ requires-python = ">=3.10"
 
 [project.urls]
 Homepage = "https://github.com/MarvinElling/CommPy"
-Iussues = "https://github.com/MarvinElling/CommPy/issues"
+Repository = "https://github.com/MarvinElling/CommPy"
+Issues = "https://github.com/MarvinElling/CommPy/issues"
+Changelog = "https://github.com/MarvinElling/CommPy/blob/main/docs/CHANGELOG.md"
+Documentation = "https://marvinelling.github.io/CommPy/"
 
 [project.optional-dependencies]
 # Optional JIT acceleration (see commpy._utils.numba_compat). Kept separate
@@ -62,6 +72,9 @@ dev = [
     "ruff",
     "yapf",
 ]
+
+[tool.setuptools.package-data]
+commpy = ["py.typed"]
 
 [tool.coverage]
 report.exclude_lines = [

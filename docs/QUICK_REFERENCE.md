@@ -270,7 +270,7 @@ rng = np.random.default_rng(seed=123)
 
 ---
 
-## New in 0.2.0
+## New in 1.0.0
 
 ```python
 # Generic modulation engine (preferred over the legacy classes above)
