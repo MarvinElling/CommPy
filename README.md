@@ -1,3 +1,5 @@
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/commpy?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/commpy)
+
 # CommPy
 
 **CommPy** is a general-purpose Python library for communications engineering (Nachrichtentechnik): channel coding, digital modulation, OFDM, information theory, and queuing theory, built on NumPy/SciPy with an optional Numba-accelerated fast path.

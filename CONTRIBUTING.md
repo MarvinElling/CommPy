@@ -33,7 +33,8 @@ pip install -e ".[dev]"
 
 ```bash
 git checkout -b feature/your-feature-name
-```
+```Die Cochlea beinhaltet drei flüssigkeitsgefüllte
+übereinander liegende Gangsystem
 
 ## Development Guidelines
 
