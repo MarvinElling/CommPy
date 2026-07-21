@@ -27,6 +27,12 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 | Find function details | [API.md](API.md) | Use Ctrl+F to search |
 | Measure BER | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 2 |
 | Contribute code | [CONTRIBUTING.md](../CONTRIBUTING.md) | Development Guidelines |
+| Error correction (FEC) | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorials 7-8 |
+| Generic M-QAM/M-PSK + soft demod | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 9 |
+| OFDM | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 10 |
+| Source coding / channel capacity | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 11 |
+| Queuing theory | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 12 |
+| Runnable end-to-end scripts | `examples/` directory | one file per feature + capstone |
 
 ---
 

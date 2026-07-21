@@ -191,18 +191,12 @@ class MyClass:
         self.param = param
 ```
 
-### 2. Update `__init__.py`
+### 2. Update the top-level `__init__.py`
 
-Export public APIs in the module's `__init__.py`:
-
-```python
-# src/commpy/_mymodule/__init__.py
-from .my_feature import my_function, MyClass
-
-__all__ = ['my_function', 'MyClass']
-```
-
-Update the main `__init__.py`:
+CommPy's subpackages (anything under `src/commpy/_*`) are PEP 420 implicit namespace
+packages — they intentionally have **no** `__init__.py` of their own. The *only* public API
+surface is the flat re-export list in `src/commpy/__init__.py`; everything under a `_`-prefixed
+submodule is private and may be reorganized freely without it being a breaking change.
 
 ```python
 # src/commpy/__init__.py

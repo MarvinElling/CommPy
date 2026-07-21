@@ -292,6 +292,158 @@ print(np.allclose(received_1, received_2))  # True
 
 ---
 
+## Tutorial 7: Error Correction with Hamming Codes
+
+Protect data against bit errors with `HammingCode`.
+
+```python
+import numpy as np
+from commpy import HammingCode
+
+code = HammingCode(m=3)  # Hamming(7, 4): 4 data bits, 3 parity bits
+
+message = np.array([1, 0, 1, 1])
+codeword = code.encode(message)
+
+# Simulate a single-bit error during transmission.
+corrupted = codeword.copy()
+corrupted[4] ^= 1
+
+decoded, corrected_codeword, error_position = code.decode(corrupted)
+print(f'Error detected at 1-indexed position {error_position}')
+print(f'Recovered message: {decoded}')  # matches the original exactly
+```
+
+Hamming codes correct *any single* bit error per codeword. For multiple errors per block, see
+`CyclicCode`/`BCHCode`/`ReedSolomonCode` next.
+
+---
+
+## Tutorial 8: Convolutional Coding + Viterbi Decoding
+
+Convolutional codes protect a continuous bitstream (rather than fixed-size blocks) and are
+decoded with the Viterbi algorithm — maximum-likelihood sequence estimation over a trellis.
+
+```python
+import numpy as np
+from commpy import Trellis, ConvolutionalEncoder, viterbi_decode, MPSKModulator, Channels
+
+trellis = Trellis(constraint_length=7, generators=(0o171, 0o133))  # the Voyager/NASA code
+encoder = ConvolutionalEncoder(trellis)
+
+message = np.random.randint(0, 2, 200)
+codeword, _ = encoder.encode(message, terminate=True)  # zero-tail terminated
+
+# Transmit over a noisy channel and decode with soft-decision (LLR) information --
+# this is more accurate than hard-decision decoding at the same SNR.
+mod = MPSKModulator(2)  # BPSK
+symbols = mod.modulate(codeword)
+received = Channels.awgn(symbols, snr_db=3.0)
+llrs = mod.soft_demodulate(received, noise_var=1.0)
+
+decoded = viterbi_decode(trellis, llrs, mode='soft', terminated=True)
+errors = np.sum(decoded != message)
+print(f'Bit errors after soft-decision Viterbi decoding: {errors}/{len(message)}')
+```
+
+---
+
+## Tutorial 9: Generic M-QAM/M-PSK with Soft-Decision Demodulation
+
+The generic `Modulator` engine (`MPSKModulator`/`MQAMModulator`/`MPAMModulator`) replaces the
+legacy per-scheme classes with one Gray-coded, unit-energy implementation, and adds soft-decision
+(LLR) output for feeding into a Viterbi or other soft decoder.
+
+```python
+import numpy as np
+from commpy import MQAMModulator, Channels
+
+mod = MQAMModulator(64)  # 64-QAM: 6 bits/symbol
+print(f'{mod.bits_per_symbol} bits/symbol, {mod.M} constellation points')
+
+bits = np.random.randint(0, 2, mod.bits_per_symbol * 10_000)
+symbols = mod.modulate(bits)
+received = Channels.awgn(symbols, snr_db=20)
+
+hard_bits = mod.demodulate(received)
+ber = np.mean(hard_bits != bits)
+print(f'Hard-decision BER at 20 dB: {ber:.4f}')
+
+# Soft output: positive LLR favors bit 0, negative favors bit 1.
+llrs = mod.soft_demodulate(received, noise_var=10**(-20 / 10))
+```
+
+---
+
+## Tutorial 10: OFDM
+
+OFDM splits a wideband channel into many narrowband subcarriers, turning a frequency-selective
+(multipath) channel into a set of flat-fading channels — one simple equalizer tap per subcarrier
+instead of a complex wideband equalizer.
+
+```python
+import numpy as np
+from commpy import OFDMModulator, OFDMDemodulator, MQAMModulator, papr_db
+
+n_fft, cp_len = 64, 16
+active = range(4, 60)  # null the DC bin and edge guard bands
+mod = OFDMModulator(n_fft, cp_len, active_subcarriers=active)
+demod = OFDMDemodulator(n_fft, cp_len, active_subcarriers=active)
+qam = MQAMModulator(16)
+
+bits = np.random.randint(0, 2, len(list(active)) * qam.bits_per_symbol * 5)
+symbols = qam.modulate(bits)
+tx_samples = mod.modulate(symbols)  # (n_fft + cp_len) samples per OFDM symbol
+
+print(f'PAPR of the first OFDM symbol: {papr_db(tx_samples[:n_fft]):.1f} dB')
+
+rx_symbols = demod.demodulate(tx_samples)  # exact inverse (noiseless round trip)
+assert np.allclose(rx_symbols, symbols)
+```
+
+---
+
+## Tutorial 11: Source Coding with Huffman Codes
+
+Compress data before transmission by exploiting known symbol statistics.
+
+```python
+from collections import Counter
+from commpy import huffman_codes, huffman_encode, huffman_decode, shannon_entropy
+
+text = 'the quick brown fox jumps over the lazy dog'
+counts = Counter(text)
+probabilities = {ch: n / len(text) for ch, n in counts.items()}
+
+codes = huffman_codes(probabilities)
+encoded = huffman_encode(list(text), codes)
+decoded = huffman_decode(encoded, codes)
+assert ''.join(decoded) == text
+
+print(f'Original: {len(text) * 8} bits, Huffman: {len(encoded)} bits')
+print(f'Entropy bound: {shannon_entropy(list(probabilities.values())):.2f} bits/char')
+```
+
+---
+
+## Tutorial 12: Queuing Theory
+
+Model waiting-line performance for a service system (e.g. a packet buffer, a call center) with
+closed-form M/M/1-family formulas.
+
+```python
+from commpy import MM1Queue
+
+queue = MM1Queue(arrival_rate=8.0, service_rate=10.0)  # customers/hour
+print(f'Utilization: {queue.utilization:.2f}')
+print(f'Average number waiting: {queue.mean_number_in_queue:.2f}')
+print(f'Average wait time: {queue.mean_wait_in_queue * 60:.1f} minutes')
+```
+
+For finite-capacity systems (`MM1KQueue`) or multiple servers (`MMcQueue`), see `docs/API.md`.
+
+---
+
 ## Common Patterns
 
 ### Pattern 1: Monte Carlo Simulation
@@ -396,17 +548,36 @@ plt.show()          # In scripts
 ```python
 from commpy import *
 
-# Modulation
+# Modulation (generic engine -- preferred)
+mod = MQAMModulator(16)
+symbols = mod.modulate(bits)
+bits = mod.demodulate(symbols)
+llrs = mod.soft_demodulate(symbols, noise_var=0.1)
+
+# Modulation (legacy, kept for backward compatibility)
 symbols = BPSK_Modulator.modulate(bits)
 bits = BPSK_Modulator.demodulate(symbols)
+
+# Channel coding
+codeword = HammingCode(m=3).encode(message)             # or CyclicCode/BCHCode/ReedSolomonCode
+codeword, _ = ConvolutionalEncoder(trellis).encode(message)
+decoded = viterbi_decode(trellis, received, mode='soft')
 
 # Channels
 noisy = Channels.awgn(signal, snr_db=10)
 degraded = Channels.bsc(bits, p=0.1)
 erased = Channels.bec(bits, p=0.1)
 
+# OFDM
+tx = OFDMModulator(n_fft=64, cp_len=16).modulate(symbols)
+
 # Information Theory
 H = shannon_entropy([0.5, 0.25, 0.25])
+capacity = channel_capacity_awgn(snr_linear=10)
+codes = huffman_codes(probabilities)
+
+# Queuing
+q = MM1Queue(arrival_rate=3.0, service_rate=5.0)
 
 # Waveforms
 wf = IQWaveform(I=I, Q=Q, T=1e-3, fs=1e6, f0=0)

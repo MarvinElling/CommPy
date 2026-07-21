@@ -270,6 +270,50 @@ rng = np.random.default_rng(seed=123)
 
 ---
 
+## New in 0.2.0
+
+```python
+# Generic modulation engine (preferred over the legacy classes above)
+from commpy import MPSKModulator, MQAMModulator, MPAMModulator
+mod = MQAMModulator(16)                          # Gray-coded, unit average energy
+symbols = mod.modulate(bits)
+llrs = mod.soft_demodulate(received, noise_var=0.1)
+
+# Channel coding (FEC)
+from commpy import CRC, HammingCode, CyclicCode, BCHCode, ReedSolomonCode
+from commpy import Trellis, ConvolutionalEncoder, viterbi_decode
+from commpy import BlockInterleaver, ConvolutionalInterleaver
+CRC.crc32().compute(b'data')
+codeword = HammingCode(m=3).encode(message)        # single-error-correcting
+codeword = ReedSolomonCode(m=8, k=223).encode(message)  # burst/symbol-error-correcting
+
+# PHY: pulse shaping, equalization, synchronization
+from commpy import raised_cosine_filter, root_raised_cosine_filter
+from commpy import zf_equalizer, mmse_equalizer
+from commpy import gardner_timing_error, estimate_cfo_mth_power, costas_loop_bpsk
+
+# OFDM
+from commpy import OFDMModulator, OFDMDemodulator, papr, papr_db, papr_ccdf
+
+# Finite fields (used internally by BCH/Reed-Solomon; usable directly too)
+from commpy import PrimeField, GF2m
+
+# Information theory
+from commpy import (
+    binary_entropy, mutual_information,
+    channel_capacity_bsc, channel_capacity_awgn, channel_capacity_dmc,
+    huffman_codes, huffman_encode, huffman_decode,
+    arithmetic_encode, arithmetic_decode, rate_distortion_binary,
+)
+
+# Queuing theory
+from commpy import MM1Queue, MM1KQueue, MMcQueue
+```
+
+See `docs/API.md` for full signatures and `examples/` for runnable end-to-end scripts.
+
+---
+
 ## Imports Summary
 
 ```python
@@ -285,6 +329,9 @@ from commpy import (
 
 # NumPy (required for arrays)
 import numpy as np
+
+# SciPy (required: FFT for OFDM, solve_toeplitz for MMSE equalization, ...)
+import scipy
 
 # Plotting (optional)
 import matplotlib.pyplot as plt

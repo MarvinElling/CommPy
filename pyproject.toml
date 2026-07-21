@@ -8,7 +8,7 @@ name = "commpy"
 authors = [
     {name = "Marvin Elling", email = "mane.der@web.de"},
 ]
-version = "0.1.2"
+version = "0.2.0"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: Apache Software License",
@@ -26,6 +26,7 @@ description = "Python Library for Communication Engineering."
 dependencies = [
   "numpy",
   "matplotlib",
+  "scipy",
 ]
 keywords = [
     "Communication",
@@ -47,6 +48,12 @@ Homepage = "https://github.com/MarvinElling/CommPy"
 Iussues = "https://github.com/MarvinElling/CommPy/issues"
 
 [project.optional-dependencies]
+# Optional JIT acceleration (see commpy._utils.numba_compat). Kept separate
+# from `dev` so the numba-absent fallback path is what contributors get by
+# default, and CI can exercise both configurations explicitly.
+fast = [
+    "numba",
+]
 dev = [
     "isort",
     "mypy",
@@ -77,15 +84,33 @@ split_on_trailing_comma = true
 
 
 [tool.mypy]
-disallow_any_explicit = true
+# NOTE: disallow_any_explicit is intentionally left at its default (off).
+# numpy's own stubs represent an unparameterized `np.ndarray` as
+# `ndarray[Any, Any]`, and `numpy.typing.ArrayLike` is an Any-containing
+# union by design (it exists precisely to accept "array-like" input: lists,
+# tuples, scalars, or ndarrays). Both are used pervasively and idiomatically
+# throughout this numpy-based library, so disallow_any_explicit would flag
+# almost every public function signature without adding real safety.
 explicit_package_bases = true
 fast_module_lookup = true
+files = ["src", "tests", "examples"]
 mypy_path = "src"
 namespace_packages = true
 strict = true
 
 [[tool.mypy.overrides]]
-module = []
+module = "tests.*"
+# Test suite: fixtures/parametrize inputs are dynamically typed and test names
+# already document intent, so strict annotation requirements add no value here.
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+# scipy does not ship inline type stubs (a separate scipy-stubs package would
+# be needed); used extensively throughout this library (FFT, filter design,
+# special functions), so untyped imports from it are expected, not an error.
+module = ["scipy.*"]
 ignore_missing_imports = true
 
 
@@ -99,30 +124,44 @@ addopts = ["--cov", "--verbose"]
 
 
 [tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
 select = [
   "ALL",
 ]
 ignore = [
-  "ANN101",
-  "ANN102",
   "PLR2004",
   "T201",
   # allow asserts
   "S101",
   "INP001",
+  # Signal-processing/coding-theory notation (I, Q, T, N, K, G, H, n, k, ...)
+  # mirrors textbook/standard formulas throughout this domain; enforcing
+  # snake_case here would actively hurt readability and cross-referencing.
+  "N803",
+  "N806",
+  # matplotlib's own API is positional-boolean-heavy (plt.grid(True), ...)
+  # and this library does substantial plotting.
+  "FBT003",
 ]
-line-length = 100
 
-[tool.ruff.isort]
+[tool.ruff.lint.per-file-ignores]
+# Test function names document intent on their own; requiring a docstring and
+# full annotations (incl. on pytest fixture parameters) on every test is pure
+# ceremony. Standard practice in numpy/scipy/pandas-style test suites.
+"tests/**" = ["ANN001", "ANN201", "ANN202", "D100", "D101", "D102", "D103", "D104"]
+
+[tool.ruff.lint.isort]
 combine-as-imports = true
 force-wrap-aliases = true
-known-first-party = ["MicEntraIdCleanup"]
+known-first-party = ["commpy"]
 
-[tool.ruff.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 avoid-escape = false
 inline-quotes = "single"
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
 

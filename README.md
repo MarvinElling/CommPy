@@ -1,23 +1,27 @@
 # CommPy
 
-**CommPy** is a Python library for communication engineering. It provides tools for modulation, channel modeling, information theory calculations, and waveform generation.
+**CommPy** is a general-purpose Python library for communications engineering (Nachrichtentechnik): channel coding, digital modulation, OFDM, information theory, and queuing theory, built on NumPy/SciPy with an optional Numba-accelerated fast path.
 
 ## Overview
 
-CommPy includes implementations of:
-- **Modulation schemes**: BPSK, QPSK, ASK-2/4, PSK-8, OOK
-- **Channel models**: Binary Symmetric Channel (BSC), Binary Erasure Channel (BEC), Additive White Gaussian Noise (AWGN)
-- **Information theory**: Shannon entropy calculations
-- **Waveform generation**: IQ modulated waveforms with customizable pulse shaping
-- **Utility functions**: Prime field operations, mathematical utilities
+CommPy covers the classic communications-engineering stack, end to end:
+
+- **Channel coding (FEC)**: CRC (8/16/32), Hamming, generic cyclic codes, BCH, Reed-Solomon (error + erasure decoding), convolutional codes with hard/soft-decision Viterbi decoding, block and convolutional interleaving.
+- **Digital modulation**: a generic, Gray-coded M-PSK/M-QAM/M-PAM engine with soft-decision (LLR) demodulation, plus the original per-scheme classes (OOK, BPSK, ASK-2/4, QPSK, 8-PSK) kept for backward compatibility.
+- **Physical layer**: raised-cosine/root-raised-cosine pulse shaping, ZF/MMSE linear equalization, symbol-timing and carrier-frequency/-phase synchronization (Gardner TED, M-th-power CFO estimation, a Costas loop).
+- **OFDM**: modulator/demodulator with configurable active subcarriers and cyclic prefix, PAPR/PAPR-CCDF analysis.
+- **Channel models**: BSC, BEC, AWGN, Rayleigh/Rician fading, Z-channel, Gilbert-Elliott bursty channel, uniform quantization.
+- **Information theory**: Shannon/binary entropy, mutual information, channel capacity (closed-form BSC/AWGN and Blahut-Arimoto for general DMCs), Huffman and arithmetic source coding, binary rate-distortion.
+- **Queuing theory**: M/M/1, M/M/1/K, M/M/c closed-form performance models.
+- **Finite-field arithmetic**: prime fields GF(p) and binary extension fields GF(2^m), the algebraic foundation for BCH/Reed-Solomon.
+- **Waveform synthesis**: pulse-shaped, optionally up-converted IQ waveforms with eye-diagram/spectrum plotting.
 
 ## Features
 
-✨ **Easy-to-use API** for modulation and demodulation
-🔊 **Channel simulation** with controllable noise and error parameters  
-📊 **Waveform generation** with flexible pulse shaping  
-🧮 **Mathematical utilities** for communication theory  
-🔒 **Full type hints** for better IDE support and code reliability
+- **Modular by design** — each topic (coding, modulation, OFDM, info theory, queuing) is an independent subpackage; shared abstractions (`Modulator`, `FiniteField`) mean adding a new scheme reuses existing, tested machinery instead of duplicating it.
+- **Resource-efficient** — vectorized NumPy throughout; SciPy where it's a genuine win (FFT for OFDM, `solve_toeplitz` for MMSE equalization); the one inherently sequential hot loop (Viterbi decoding) gets optional Numba JIT acceleration via `pip install commpy[fast]`, with a correctness-preserving pure-Python fallback when it's not installed.
+- **Rigorously tested** — 300+ tests, including exhaustive brute-force cross-validation for algebraic decoders (BCH, Reed-Solomon) and Viterbi against maximum-likelihood search, and statistical BER-vs-SNR checks against theoretical curves.
+- **Fully typed** — complete type hints throughout, checked with `mypy --strict`.
 
 ## Installation
 
@@ -25,258 +29,135 @@ CommPy includes implementations of:
 pip install commpy
 ```
 
+With optional JIT acceleration for Viterbi decoding:
+
+```bash
+pip install commpy[fast]
+```
+
 Or install from source:
 
 ```bash
 git clone <repository-url>
 cd CommPy
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 ## Quick Start
 
-### Modulation
-
-Modulate binary data using various schemes:
+### Channel coding: Reed-Solomon
 
 ```python
-from commpy import BPSK_Modulator, QPSK_Modulator
-
-# BPSK modulation
-bits = [0, 1, 0, 1, 1, 0]
-symbols = BPSK_Modulator.modulate(bits)
-demodulated = BPSK_Modulator.demodulate(symbols)
-
-# QPSK modulation
-symbols_qpsk = QPSK_Modulator.modulate(bits)
-```
-
-### Channel Simulation
-
-Simulate signals over wireless channels:
-
-```python
-from commpy import Channels
+from commpy import ReedSolomonCode
 import numpy as np
 
-# Create a signal
-signal = np.array([1+1j, -1-1j, 1+1j])
+code = ReedSolomonCode(m=8, k=223)  # RS(255, 223), the classic CCSDS code
+message = np.arange(223) % code.field.order
+codeword = code.encode(message)
 
-# Pass through AWGN channel at 10 dB SNR
-noisy_signal = Channels.awgn(signal, snr_db=10)
+corrupted = codeword.copy()
+corrupted[[10, 50, 100]] ^= 1  # 3 symbol errors, well within t=16
+decoded, _, n_errors = code.decode(corrupted)
+assert np.array_equal(decoded, message)
 ```
 
-### Information Theory
-
-Calculate Shannon entropy:
+### Digital modulation with soft-decision demodulation
 
 ```python
-from commpy import shannon_entropy
-
-probabilities = [0.25, 0.25, 0.5]
-entropy = shannon_entropy(probabilities)
-print(f"Shannon entropy: {entropy:.2f} bits")
-```
-
-### IQ Waveform Generation
-
-Generate IQ modulated RF waveforms:
-
-```python
-from commpy import IQWaveform
+from commpy import MQAMModulator, Channels
 import numpy as np
 
-# Symbol sequences
-I_symbols = np.array([1, 0, -1, 0])
-Q_symbols = np.array([0, 1, 0, -1])
+mod = MQAMModulator(16)  # 16-QAM, Gray-coded, unit average energy
+bits = np.random.randint(0, 2, mod.bits_per_symbol * 1000)
+symbols = mod.modulate(bits)
 
-# Create waveform
-waveform = IQWaveform(
-    I=I_symbols,
-    Q=Q_symbols,
-    T=1e-3,           # Symbol period: 1 ms
-    fs=1e6,           # Sample rate: 1 MHz
-    f0=100e3          # Carrier frequency: 100 kHz
-)
-
-# Plot and analyze
-waveform.plot_waveform()
+received = Channels.awgn(symbols, snr_db=15)
+llrs = mod.soft_demodulate(received, noise_var=1.0)  # feed straight into a Viterbi decoder
+hard_bits = mod.demodulate(received)
 ```
+
+### Convolutional coding + Viterbi decoding
+
+```python
+from commpy import Trellis, ConvolutionalEncoder, viterbi_decode
+import numpy as np
+
+trellis = Trellis(constraint_length=7, generators=(0o171, 0o133))  # the classic Voyager code
+encoder = ConvolutionalEncoder(trellis)
+
+message = np.random.randint(0, 2, 100)
+codeword, _ = encoder.encode(message, terminate=True)
+decoded = viterbi_decode(trellis, codeword, mode='hard', terminated=True)
+assert np.array_equal(decoded, message)
+```
+
+### OFDM
+
+```python
+from commpy import OFDMModulator, OFDMDemodulator, MQAMModulator, papr_db
+import numpy as np
+
+mod, demod = OFDMModulator(n_fft=64, cp_len=16), OFDMDemodulator(n_fft=64, cp_len=16)
+qam = MQAMModulator(4)
+
+bits = np.random.randint(0, 2, 64 * qam.bits_per_symbol * 10)
+symbols = qam.modulate(bits)
+tx = mod.modulate(symbols)
+print(f"PAPR: {papr_db(tx[:64]):.1f} dB")
+
+rx_symbols = demod.demodulate(tx)
+assert np.allclose(rx_symbols, symbols)
+```
+
+### Information theory
+
+```python
+from commpy import channel_capacity_awgn, huffman_codes, huffman_encode
+
+capacity = channel_capacity_awgn(snr_linear=10)  # bits/channel use
+
+codes = huffman_codes({'a': 0.5, 'b': 0.25, 'c': 0.25})
+encoded = huffman_encode(['a', 'a', 'b', 'c'], codes)
+```
+
+More end-to-end examples, including a full transmit chain composing several of these pieces, live in [`examples/`](examples/).
 
 ## Module Structure
 
 ```
 commpy/
-├── _channelCoding/          # Modulation and channel models
-│   ├── modulation_analogCarrier_digitalData.py
-│   ├── channels.py
-│   └── fields.py
-├── _informationTheory/      # Information theory calculations
-│   └── formulas.py
-├── _waves/                  # Waveform generation
-│   └── iq_wave.py
-├── _utils/                  # Utility functions
-│   └── maths.py
-└── __init__.py             # Package entry point
+├── _channelCoding/
+│   ├── block/            # CRC, Hamming, cyclic, BCH, Reed-Solomon
+│   ├── convolutional/    # Trellis, encoder, Viterbi (hard/soft)
+│   └── interleaving/     # Block and convolutional interleavers
+├── _channels/            # Channel impairment models (BSC, BEC, AWGN, fading, ...)
+├── _fields/               # GF(p) and GF(2^m) arithmetic, polynomials
+├── _informationTheory/   # Entropy, capacity, source coding, rate-distortion
+├── _modulation/          # Generic M-PSK/M-QAM/M-PAM engine, legacy classes,
+│                          # pulse shaping, equalization, synchronization
+├── _networking/          # M/M/1-family queuing models
+├── _ofdm/                 # OFDM modulator/demodulator, PAPR analysis
+├── _utils/                # Math helpers, optional-Numba shim
+├── _waves/                # IQ waveform synthesis and plotting
+└── __init__.py            # Public API (flat re-export; everything else is private)
 ```
 
-## API Reference
+Only names exported from `commpy/__init__.py` are public API; submodules (anything starting with `_`) may be reorganized without notice.
 
-### Modulation Classes
+## Documentation
 
-#### `BPSK_Modulator`
-Binary Phase Shift Keying - maps 0→-1, 1→+1
-
-```python
-# Modulate
-symbols = BPSK_Modulator.modulate(bits)
-
-# Demodulate
-bits = BPSK_Modulator.demodulate(symbols)
-```
-
-#### `QPSK_Modulator`
-Quadrature Phase Shift Keying - 4-symbol constellation
-
-#### `ASK_2_Modulator` & `ASK_4_Modulator`
-Amplitude Shift Keying with 2 or 4 amplitude levels
-
-#### `PSK_8_Modulator`
-8-PSK modulation with 8-symbol constellation
-
-#### `OOK_Modulator`
-On-Off Keying - simple amplitude modulation
-
-### Channel Models
-
-#### `Channels.bsc(bits, p, rng=None)`
-Binary Symmetric Channel - flips each bit with probability `p`
-
-**Parameters:**
-- `bits`: Array of bits (0/1 or boolean)
-- `p`: Bit flip probability [0, 1]
-- `rng`: Optional `np.random.Generator` for reproducibility
-
-#### `Channels.bec(bits, p, erasure_value=-1, rng=None)`
-Binary Erasure Channel - erases symbols with probability `p`
-
-**Parameters:**
-- `bits`: Array of symbols
-- `p`: Erasure probability [0, 1]
-- `erasure_value`: Symbol value to indicate erasure
-
-#### `Channels.awgn(x, snr_db, rng=None)`
-Additive White Gaussian Noise - adds noise to achieve target SNR
-
-**Parameters:**
-- `x`: Input signal (real or complex)
-- `snr_db`: Target signal-to-noise ratio in dB
-- `rng`: Optional `np.random.Generator` for reproducibility
-
-### Information Theory
-
-#### `shannon_entropy(probabilities)`
-Calculate Shannon entropy of a probability distribution
-
-**Parameters:**
-- `probabilities`: List of probabilities (must sum to 1)
-
-**Returns:** Shannon entropy in bits
-
-### Waveform Generation
-
-#### `IQWaveform(I, Q, T, fs, f0=0, pulse_shape=None, span=4)`
-Generate IQ modulated waveforms
-
-**Parameters:**
-- `I, Q`: Arrays of I/Q symbols
-- `T`: Symbol period (seconds)
-- `fs`: Sample rate (Hz)
-- `f0`: Carrier frequency (Hz), 0 for baseband
-- `pulse_shape`: Callable defining pulse shape (default: rectangular)
-- `span`: Pulse truncation window in multiples of T
-
-**Attributes:**
-- `.t`: Time vector
-- `.s`: Baseband complex signal or bandpass real signal
-- `.s_I`, `.s_Q`: I and Q components
-
-**Methods:**
-- `.plot_waveform()`: Visualize the generated waveform
-
-### Utility Functions
-
-#### `is_prime(n)`
-Check if a number is prime
-
-#### `modinv(a, m)`
-Compute modular multiplicative inverse of `a` modulo `m`
-
-#### `PrimeField`
-Finite field arithmetic over prime modulus
-
-## Examples
-
-### Example 1: Modulate and Demodulate with AWGN
-
-```python
-import numpy as np
-from commpy import BPSK_Modulator, Channels
-
-# Generate random bits
-bits = np.random.randint(0, 2, 100)
-
-# Modulate
-symbols = BPSK_Modulator.modulate(bits)
-
-# Pass through AWGN channel
-noisy = Channels.awgn(symbols, snr_db=5)
-
-# Demodulate
-recovered = BPSK_Modulator.demodulate(noisy)
-
-# Check error rate
-errors = np.sum(recovered != bits)
-print(f"Bit errors: {errors}/100")
-```
-
-### Example 2: Multi-Symbol Modulation
-
-```python
-from commpy import QPSK_Modulator, ASK_4_Modulator
-
-# QPSK has 4 symbols per 2 bits
-pairs = [0, 1, 2, 3]  # 2-bit values
-qpsk_symbols = QPSK_Modulator.modulate(pairs)
-
-# ASK-4 also has 4 levels
-ask_symbols = ASK_4_Modulator.modulate(pairs)
-```
-
-### Example 3: Channel Comparison
-
-```python
-from commpy import Channels
-import numpy as np
-
-bits = np.array([1, 0, 1, 1, 0])
-
-# BSC with 10% error rate
-bsc_out = Channels.bsc(bits, p=0.1)
-
-# BEC with 10% erasure rate
-bec_out = Channels.bec(bits, p=0.1)
-
-print("Original:", bits)
-print("BSC output:", bsc_out)
-print("BEC output:", bec_out)
-```
+- [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) — tutorials, one per major feature area.
+- [`docs/API.md`](docs/API.md) — full API reference.
+- [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — theory background and best practices.
+- [`docs/QUICK_REFERENCE.md`](docs/QUICK_REFERENCE.md) — cheat sheet.
+- [`docs/FAQ.md`](docs/FAQ.md), [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
+- [`examples/`](examples/) — runnable scripts, one per major feature plus a full-chain capstone.
 
 ## Requirements
 
 - Python ≥ 3.10
-- NumPy
-- Matplotlib (for plotting)
+- NumPy, SciPy, Matplotlib
+- Optional: Numba (`pip install commpy[fast]`), for JIT-accelerated Viterbi decoding
 
 ## License
 
@@ -288,5 +169,4 @@ Marvin Elling
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
-
+Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests. See [CONTRIBUTING.md](CONTRIBUTING.md).

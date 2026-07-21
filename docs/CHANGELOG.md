@@ -2,7 +2,58 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.2] - Current Release
+## [0.2.0] - Current Release
+
+A major expansion from a small modulation/channel-model library into a
+comprehensive communications-engineering toolkit. No breaking changes to the
+public API (`commpy.*`); three previously-broken imports left over from an
+earlier package rename are fixed as part of this release.
+
+### Added
+
+#### Channel coding (FEC) — `_channelCoding/`
+- **Block codes** (`block/`): `CRC` (CRC-8/CRC-16-XMODEM/CRC-32 presets, plus a custom `CRCConfig`), `HammingCode`, generic `CyclicCode`, `BCHCode`, `ReedSolomonCode` (error decoding via Berlekamp-Massey/Chien search/Forney, plus a separate erasures-only decoder correcting up to `n-k` erasures).
+- **Convolutional codes** (`convolutional/`): `Trellis`, `ConvolutionalEncoder`, `viterbi_decode` (hard- and soft-decision, zero-tail termination, optional Numba JIT acceleration on the add-compare-select trellis traversal).
+- **Interleaving** (`interleaving/`): `BlockInterleaver`, `ConvolutionalInterleaver` (Ramsey type-II).
+
+#### Galois field arithmetic — `_fields/`
+- `PrimeField` (GF(p)) generalized onto a new `FiniteField` abstract base.
+- `GF2m`: binary extension field GF(2^m) via log/antilog tables, fully vectorized, used by BCH/Reed-Solomon.
+- Polynomial arithmetic over any `FiniteField` (`poly_add`/`poly_mul`/`poly_divmod`/`poly_eval`).
+
+#### Digital modulation & PHY — `_modulation/`
+- Generic, Gray-coded `Modulator` base class with `MPSKModulator`, `MQAMModulator` (square constellations), `MPAMModulator`, and generic soft-decision (LLR) demodulation.
+- Original per-scheme classes (`OOK_Modulator`, `BPSK_Modulator`, `ASK_2_Modulator`, `ASK_4_Modulator`, `QPSK_Modulator`, `PSK_8_Modulator`) kept for backward compatibility; the `QPSK_Modulator` list-vs-array bug is fixed.
+- `raised_cosine_filter` / `root_raised_cosine_filter`, drop-in compatible with `IQWaveform`'s `pulse_shape` parameter.
+- `zf_equalizer` / `mmse_equalizer` linear FIR channel equalizers.
+- `gardner_timing_error`, `estimate_cfo_mth_power`, `costas_loop_bpsk` synchronization primitives.
+
+#### OFDM — `_ofdm/`
+- `OFDMModulator` / `OFDMDemodulator` with configurable active subcarriers and cyclic prefix.
+- `papr`, `papr_db`, `papr_ccdf` for peak-to-average power ratio analysis.
+
+#### Information theory — `_informationTheory/`
+- `binary_entropy`, `mutual_information`, `channel_capacity_bsc`, `channel_capacity_awgn`, `channel_capacity_dmc` (Blahut-Arimoto).
+- `huffman_codes`/`huffman_encode`/`huffman_decode`, `arithmetic_encode`/`arithmetic_decode` (exact-rational arithmetic coding).
+- `rate_distortion_binary` (closed-form binary rate-distortion function).
+
+#### Networking — `_networking/`
+- `MM1Queue`, `MM1KQueue`, `MMcQueue`: closed-form M/M/1-family queuing performance models.
+
+#### Infrastructure
+- CI (`.github/workflows/ci.yml`) now runs `ruff`, `mypy --strict`, and `pytest` on every push/PR across Python 3.10-3.12, including a dedicated job for the numba-absent fallback path.
+- `scipy` is now a hard dependency (FFT for OFDM, `solve_toeplitz` for MMSE equalization, `erfc` for BER reference curves in tests). `numba` is an optional `commpy[fast]` extra for JIT-accelerated Viterbi decoding.
+- Test suite grew from 3 tests to 300+, including exhaustive brute-force cross-validation for BCH/Reed-Solomon decoding and Viterbi-vs-maximum-likelihood-search checks.
+
+### Fixed
+- Three stale `CommPy` → `commpy` imports (from an earlier package rename) that broke `PrimeField`, the test suite, and `IQWaveform`'s demo block.
+
+### Changed
+- Internal package layout reorganized (`_channelCoding/` split into `_channels/`, `_fields/`, `_modulation/`, plus the new `_channelCoding/{block,convolutional,interleaving}/`). This only affects private (`_`-prefixed) submodules; the public `commpy.*` API is unchanged.
+
+---
+
+## [0.1.2] - Previous Release
 
 ### Added
 
