@@ -83,6 +83,17 @@ from ._networking.queuing import MM1KQueue, MM1Queue, MMcQueue
 # OFDM
 from ._ofdm.ofdm import OFDMDemodulator, OFDMModulator, papr, papr_ccdf, papr_db
 
+# SDR interoperability: raw IQ and SigMF file I/O
+from ._sdr.iq_file import read_iq, read_sigmf, write_iq, write_sigmf
+
+# Link-level simulation: Monte-Carlo BER/FER sweeps
+from ._simulation.link_simulation import (
+    SimulationResult,
+    plot_waterfall,
+    simulate_ber,
+    simulate_error_rate,
+)
+
 # Math utilities
 from ._utils.maths import is_prime, modinv
 
@@ -118,6 +129,7 @@ __all__ = [
     'PrimeField',
     'QPSK_Modulator',
     'ReedSolomonCode',
+    'SimulationResult',
     'Trellis',
     '__version__',
     'arithmetic_decode',
@@ -139,10 +151,17 @@ __all__ = [
     'papr',
     'papr_ccdf',
     'papr_db',
+    'plot_waterfall',
     'raised_cosine_filter',
     'rate_distortion_binary',
+    'read_iq',
+    'read_sigmf',
     'root_raised_cosine_filter',
     'shannon_entropy',
+    'simulate_ber',
+    'simulate_error_rate',
     'viterbi_decode',
+    'write_iq',
+    'write_sigmf',
     'zf_equalizer',
 ]

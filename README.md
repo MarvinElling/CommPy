@@ -6,7 +6,7 @@
 
 # CommPy
 
-**CommPy** is a general-purpose Python library for communications engineering (Nachrichtentechnik): channel coding, digital modulation, OFDM, information theory, and queuing theory, built on NumPy/SciPy with an optional Numba-accelerated fast path.
+**CommPy** is a general-purpose Python library for communications engineering (Nachrichtentechnik): channel coding, digital modulation, OFDM, information theory, queuing theory, and link-level simulation, built on NumPy/SciPy with an optional Numba-accelerated fast path.
 
 ## Overview
 
@@ -21,6 +21,8 @@ CommPy covers the classic communications-engineering stack, end to end:
 - **Queuing theory**: M/M/1, M/M/1/K, M/M/c closed-form performance models.
 - **Finite-field arithmetic**: prime fields GF(p) and binary extension fields GF(2^m), the algebraic foundation for BCH/Reed-Solomon.
 - **Waveform synthesis**: pulse-shaped, optionally up-converted IQ waveforms with eye-diagram/spectrum plotting.
+- **SDR interoperability**: read/write raw complex IQ recordings (GNU Radio-compatible) and SigMF (`.sigmf-data`/`.sigmf-meta`) recordings.
+- **Link-level simulation**: early-stopping Monte-Carlo BER/FER sweeps with Wilson-score confidence intervals and waterfall-curve plotting.
 
 ## Features
 
@@ -126,6 +128,19 @@ codes = huffman_codes({'a': 0.5, 'b': 0.25, 'c': 0.25})
 encoded = huffman_encode(['a', 'a', 'b', 'c'], codes)
 ```
 
+### Monte-Carlo BER simulation & SigMF file I/O
+
+```python
+from commpy import Channels, MQAMModulator, plot_waterfall, simulate_ber, write_sigmf
+
+mod = MQAMModulator(16)
+result = simulate_ber(mod, Channels.awgn, snr_db_range=[6, 8, 10, 12], target_errors=200)
+print(result.error_rate, result.ci_lower, result.ci_upper)  # early-stopped, with 95% CIs
+plot_waterfall(result)
+
+write_sigmf('capture', mod.modulate([0, 1] * 1000), sample_rate=1e6, center_freq=915e6)
+```
+
 More end-to-end examples, including a full transmit chain composing several of these pieces, live in [`examples/`](examples/).
 
 ## Module Structure
@@ -143,6 +158,8 @@ commpy/
 │                          # pulse shaping, equalization, synchronization
 ├── _networking/          # M/M/1-family queuing models
 ├── _ofdm/                 # OFDM modulator/demodulator, PAPR analysis
+├── _sdr/                  # Raw IQ and SigMF file I/O
+├── _simulation/           # Monte-Carlo BER/FER simulation, waterfall plotting
 ├── _utils/                # Math helpers, optional-Numba shim
 ├── _waves/                # IQ waveform synthesis and plotting
 └── __init__.py            # Public API (flat re-export; everything else is private)

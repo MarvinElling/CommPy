@@ -444,6 +444,44 @@ For finite-capacity systems (`MM1KQueue`) or multiple servers (`MMcQueue`), see 
 
 ---
 
+## Tutorial 13: Monte-Carlo BER Simulation & SDR File I/O
+
+`simulate_ber` formalizes the "sweep SNR, count bit errors" pattern from Tutorial 2: it runs
+each SNR point until a target number of errors is observed (or a trial cap is hit), and reports
+a confidence interval alongside the point estimate.
+
+```python
+from commpy import Channels, MQAMModulator, plot_waterfall, simulate_ber
+
+mod = MQAMModulator(16)
+result = simulate_ber(
+    mod, Channels.awgn, snr_db_range=[6, 8, 10, 12, 14, 16],
+    target_errors=200,  # stop early once 200 bit errors are observed
+)
+for snr, ber, lo, hi in zip(result.snr_db, result.error_rate, result.ci_lower, result.ci_upper):
+    print(f'{snr:.0f} dB: BER={ber:.5f}  95% CI=[{lo:.5f}, {hi:.5f}]')
+
+plot_waterfall(result)  # BER-vs-SNR curve with error bars; call plt.show() to display it
+```
+
+`write_iq`/`read_iq` and `write_sigmf`/`read_sigmf` connect CommPy to real IQ recordings: the
+former is a headerless raw binary stream compatible with GNU Radio's `blocks.file_source`, the
+latter adds a [SigMF](https://github.com/sigmf/SigMF) JSON metadata sidecar (sample rate, center
+frequency, description).
+
+```python
+from commpy import write_sigmf, read_sigmf
+
+symbols = mod.modulate(bits)
+write_sigmf('capture', symbols, sample_rate=1e6, center_freq=915e6, description='16-QAM test')
+recovered, meta = read_sigmf('capture')  # -> (ndarray, dict); meta['global']['core:sample_rate']
+```
+
+See [`examples/ber_waterfall_simulation.py`](../examples/ber_waterfall_simulation.py) and
+[`examples/sigmf_iq_io.py`](../examples/sigmf_iq_io.py) for full runnable versions.
+
+---
+
 ## Common Patterns
 
 ### Pattern 1: Monte Carlo Simulation
@@ -581,6 +619,14 @@ q = MM1Queue(arrival_rate=3.0, service_rate=5.0)
 
 # Waveforms
 wf = IQWaveform(I=I, Q=Q, T=1e-3, fs=1e6, f0=0)
+
+# Link-level simulation
+result = simulate_ber(mod, Channels.awgn, snr_db_range=[6, 10, 14], target_errors=200)
+plot_waterfall(result)
+
+# SDR file I/O
+write_iq('recording.cf32', symbols)
+write_sigmf('capture', symbols, sample_rate=1e6, center_freq=915e6)
 
 # Utilities
 is_prime(7)

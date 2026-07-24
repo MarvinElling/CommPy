@@ -9,8 +9,9 @@ A comprehensive guide to understanding and using CommPy's features.
 3. [Channel Models](#channel-models)
 4. [Information Theory](#information-theory)
 5. [Waveform Generation](#waveform-generation)
-6. [Practical Applications](#practical-applications)
-7. [Best Practices](#best-practices)
+6. [SDR Interoperability & Link Simulation](#sdr-interoperability--link-simulation)
+7. [Practical Applications](#practical-applications)
+8. [Best Practices](#best-practices)
 
 ---
 
@@ -593,6 +594,63 @@ plt.ylabel('Amplitude')
 plt.title('QPSK RF Signal')
 plt.grid(True, alpha=0.3)
 plt.show()
+```
+
+---
+
+## SDR Interoperability & Link Simulation
+
+### Why these two go together
+
+Once you can generate waveforms (previous section), two things become useful: exchanging IQ
+samples with real hardware/tools, and rigorously measuring how a link performs across SNR. Both
+are covered here.
+
+### Monte-Carlo BER simulation
+
+The pattern from earlier sections — sweep SNR, count bit errors, compare against a theoretical
+curve — is common enough to warrant a dedicated, statistically sound implementation:
+`simulate_ber` runs each SNR point until a target error count is reached (bounding the
+estimator's variance) instead of a fixed, one-size-fits-all trial count, and reports a Wilson
+score confidence interval alongside the point estimate.
+
+```python
+from commpy import Channels, MQAMModulator, plot_waterfall, simulate_ber
+
+mod = MQAMModulator(16)
+result = simulate_ber(mod, Channels.awgn, snr_db_range=[6, 8, 10, 12, 14, 16], target_errors=200)
+
+# result.error_rate, result.ci_lower, result.ci_upper, result.n_trials are all arrays,
+# one entry per SNR point.
+ax = plot_waterfall(result)
+ax.figure.show()
+```
+
+For frame/block error rates (or any other error metric), use the lower-level
+`simulate_error_rate(trial_fn, snr_db_range, ...)`, where `trial_fn(snr_db, rng, n_trials)`
+returns `(n_errors, n_trials_run)` for whatever unit of trial you define (frames, codewords, ...).
+
+### SDR file interoperability
+
+`write_iq`/`read_iq` write/read a headerless raw complex-sample stream, directly compatible with
+GNU Radio's `blocks.file_sink`/`blocks.file_source` blocks. `write_sigmf`/`read_sigmf` add a
+[SigMF](https://github.com/sigmf/SigMF) `.sigmf-meta` JSON sidecar recording sample rate, center
+frequency, and free-text description alongside the `.sigmf-data` samples — useful when a
+recording needs to be self-describing (e.g. archiving a capture, or handing it to a teammate).
+
+```python
+from commpy import write_iq, read_iq, write_sigmf, read_sigmf
+
+symbols = mod.modulate(bits)
+
+# Raw binary: GNU Radio compatible, no metadata.
+write_iq('recording.cf32', symbols)
+recovered = read_iq('recording.cf32')
+
+# SigMF: adds sample rate / center frequency / description metadata.
+write_sigmf('capture', symbols, sample_rate=1e6, center_freq=915e6, description='16-QAM test')
+recovered, meta = read_sigmf('capture')
+print(meta['global']['core:sample_rate'], meta['captures'][0]['core:frequency'])
 ```
 
 ---

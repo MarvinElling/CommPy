@@ -32,6 +32,8 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 | OFDM | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 10 |
 | Source coding / channel capacity | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 11 |
 | Queuing theory | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 12 |
+| Monte-Carlo BER simulation with CIs | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 13 |
+| Read/write SigMF or raw IQ files | [GETTING_STARTED.md](GETTING_STARTED.md) | Tutorial 13 |
 | Runnable end-to-end scripts | `examples/` directory | one file per feature + capstone |
 
 ---
@@ -62,7 +64,7 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 **Contains:**
 - Installation verification
 - Basic concepts explained
-- 6 hands-on tutorials
+- 13 hands-on tutorials
 - Common patterns
 - Troubleshooting guide
 - Quick reference cheat sheet
@@ -80,6 +82,13 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 4. Different modulation schemes
 5. IQ waveform generation
 6. Reproducible results with RNG
+7. Error correction with Hamming codes
+8. Convolutional coding + Viterbi decoding
+9. Generic M-QAM/M-PSK with soft-decision demodulation
+10. OFDM
+11. Source coding with Huffman codes
+12. Queuing theory
+13. Monte-Carlo BER simulation & SDR file I/O
 
 ---
 
@@ -228,6 +237,11 @@ Welcome to CommPy documentation! This guide helps you find what you need.
 - Example: [GETTING_STARTED.md](GETTING_STARTED.md) Tutorial 5
 - Deep dive: [USER_GUIDE.md](USER_GUIDE.md) - Waveform Generation
 - API: [API.md](API.md) - IQWaveform class
+
+**SDR Interop & Link Simulation:**
+- Tutorial: [GETTING_STARTED.md](GETTING_STARTED.md) Tutorial 13
+- Deep dive: [USER_GUIDE.md](USER_GUIDE.md) - SDR Interoperability & Link Simulation
+- API: [API.md](API.md) - SDR Interoperability / Link-Level Simulation sections
 
 **Best Practices:**
 - Quick tips: [GETTING_STARTED.md](GETTING_STARTED.md) - Common Patterns

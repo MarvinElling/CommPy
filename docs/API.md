@@ -19,7 +19,9 @@ Complete API documentation for the CommPy communication engineering library.
 13. [Source Coding](#source-coding)
 14. [Queuing Theory](#queuing-theory)
 15. [Waveforms](#waveforms)
-16. [Utilities](#utilities)
+16. [SDR Interoperability](#sdr-interoperability)
+17. [Link-Level Simulation](#link-level-simulation)
+18. [Utilities](#utilities)
 
 ---
 
@@ -869,6 +871,155 @@ wf = IQWaveform(
 
 print(f"Bandpass signal (real): {wf.s[:100]}")
 wf.plot_waveform()
+```
+
+---
+
+## SDR Interoperability
+
+Read/write complex baseband IQ recordings in two on-disk formats: a raw,
+headerless binary stream (compatible with GNU Radio's
+`blocks.file_sink`/`blocks.file_source`) and [SigMF](https://github.com/sigmf/SigMF)
+recordings (a `.sigmf-data` sample file plus a `.sigmf-meta` JSON sidecar).
+
+### write_iq() / read_iq()
+
+**Signature:**
+```python
+write_iq(path: str | Path, samples: ArrayLike, dtype: DTypeLike = np.complex64) -> None
+read_iq(path: str | Path, dtype: DTypeLike = np.complex64) -> ndarray
+```
+
+**Parameters:**
+- `path` - Output/input file path
+- `samples` - Complex baseband samples (write only)
+- `dtype` - On-disk sample dtype; `np.complex64` (GNU Radio's default `gr_complex`) or `np.complex128`
+
+**Raises:** `ValueError` if `dtype` is not `complex64`/`complex128` (`write_iq` only).
+
+```python
+from commpy import MQAMModulator, read_iq, write_iq
+
+mod = MQAMModulator(16)
+symbols = mod.modulate([0, 1] * 500)
+write_iq('recording.cf32', symbols)
+recovered = read_iq('recording.cf32')
+```
+
+### write_sigmf() / read_sigmf()
+
+**Signature:**
+```python
+write_sigmf(
+    path: str | Path,
+    samples: ArrayLike,
+    sample_rate: float,
+    center_freq: float = 0.0,
+    *,
+    dtype: DTypeLike = np.complex64,
+    description: str = '',
+    author: str = '',
+) -> None
+read_sigmf(path: str | Path) -> tuple[ndarray, dict]
+```
+
+**Parameters:**
+- `path` - Base path (extension-less); writes/reads `<path>.sigmf-data` and `<path>.sigmf-meta`.
+  `read_sigmf` also accepts a path ending in `.sigmf-data` or `.sigmf-meta`.
+- `sample_rate`, `center_freq` - Recorded in the `.sigmf-meta` sidecar's `global`/`captures` sections
+- `description`, `author` - Free-text metadata fields
+
+**Raises:** `ValueError` if `dtype` (write) or the recording's `core:datatype` (read) is not a supported complex format.
+
+```python
+from commpy import write_sigmf, read_sigmf
+
+write_sigmf('capture', symbols, sample_rate=1e6, center_freq=915e6, description='16-QAM test capture')
+recovered, meta = read_sigmf('capture')
+print(meta['global']['core:sample_rate'])
+```
+
+---
+
+## Link-Level Simulation
+
+Monte-Carlo error-rate simulation with early stopping and confidence
+intervals, plus waterfall-curve plotting.
+
+### simulate_error_rate()
+
+Generic core: drives an arbitrary "run N trials at this SNR, count errors"
+function, so it works for bit-, frame-, or symbol-error rates alike.
+
+**Signature:**
+```python
+simulate_error_rate(
+    trial_fn: Callable[[float, Generator, int], tuple[int, int]],
+    snr_db_range: ArrayLike,
+    *,
+    target_errors: int = 100,
+    max_trials: int = 10_000_000,
+    trials_per_batch: int = 10_000,
+    confidence: float = 0.95,
+    rng: Generator | None = None,
+) -> SimulationResult
+```
+
+For each SNR point, `trial_fn` runs in batches until either `target_errors`
+errors have been observed or `max_trials` trials have run — early stopping
+avoids spending a large, fixed trial budget at SNR points that converge
+almost immediately.
+
+### simulate_ber()
+
+Convenience wrapper around `simulate_error_rate` for the common
+modulate → channel → demodulate → count-bit-errors case.
+
+**Signature:**
+```python
+simulate_ber(
+    modulator: Modulator,
+    channel_fn: Callable[[ndarray, float, Generator], ndarray],
+    snr_db_range: ArrayLike,
+    *,
+    bits_per_batch: int = 10_000,
+    target_errors: int = 100,
+    max_trials: int = 10_000_000,
+    confidence: float = 0.95,
+    rng: Generator | None = None,
+) -> SimulationResult
+```
+
+`channel_fn` is called positionally as `channel_fn(symbols, snr_db, rng)`,
+so `Channels.awgn`/`Channels.rayleigh` work directly; channels with extra
+parameters (e.g. `Channels.rician`) need a small wrapper.
+
+### SimulationResult
+
+Frozen dataclass with one entry per SNR point: `snr_db`, `error_rate`,
+`ci_lower`, `ci_upper` (Wilson score interval), `n_trials`, `n_errors`.
+
+### plot_waterfall()
+
+**Signature:**
+```python
+plot_waterfall(
+    result: SimulationResult,
+    theoretical: Callable[[ndarray], ndarray] | None = None,
+    ax: Axes | None = None,
+) -> Axes
+```
+
+Plots the BER/FER-vs-SNR curve (log scale) with confidence-interval error
+bars, optionally overlaid with a closed-form `theoretical` reference curve.
+
+```python
+from commpy import Channels, MQAMModulator, plot_waterfall, simulate_ber
+
+mod = MQAMModulator(16)
+result = simulate_ber(mod, Channels.awgn, snr_db_range=[6, 8, 10, 12, 14], target_errors=200)
+ax = plot_waterfall(result)
+ax.figure.show()
 ```
 
 ---
