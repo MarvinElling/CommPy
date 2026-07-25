@@ -3,6 +3,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/MarvinElling/CommPy/actions/workflows/ci.yml/badge.svg)](https://github.com/MarvinElling/CommPy/actions/workflows/ci.yml)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/commpy?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/commpy)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/MarvinElling/CommPy/blob/main/examples/quickstart.ipynb)
 
 # CommPy
 
@@ -141,7 +142,7 @@ plot_waterfall(result)
 write_sigmf('capture', mod.modulate([0, 1] * 1000), sample_rate=1e6, center_freq=915e6)
 ```
 
-More end-to-end examples, including a full transmit chain composing several of these pieces, live in [`examples/`](examples/).
+More end-to-end examples, including a full transmit chain composing several of these pieces, live in [`examples/`](examples/) — or try [`examples/quickstart.ipynb`](examples/quickstart.ipynb) straight in your browser via the Colab badge above.
 
 ## Module Structure
 

@@ -4,10 +4,8 @@ Thank you for your interest in contributing to CommPy! This guide explains how t
 
 ## Code of Conduct
 
-- Be respectful and inclusive
-- Provide constructive feedback
-- Focus on code quality and clarity
-- Help others learn and improve
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By
+participating, you are expected to uphold it.
 
 ## Getting Started
 
@@ -278,33 +276,10 @@ git push origin feature/your-feature-name
 On GitHub:
 1. Click "New Pull Request"
 2. Select `base: main` ← `compare: your-branch`
-3. Write clear PR description
+3. Write a clear PR description — the fields are pre-filled from
+   [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md)
 4. Link related issues
 5. Request review
-
-**PR Template:**
-
-```markdown
-## Description
-Brief description of changes.
-
-## Motivation
-Why is this needed?
-
-## Changes
-- Change 1
-- Change 2
-
-## Testing
-How was this tested?
-
-## Checklist
-- [x] Code follows style guidelines
-- [x] Documentation updated
-- [x] Tests added/updated
-- [x] Type hints complete
-- [x] No breaking changes
-```
 
 ## Code Review Process
 
@@ -396,42 +371,11 @@ print(f"Bit error rate: {ber:.4f}")
 
 ## Reporting Issues
 
-### Bug Reports
-
-Include:
-- **Title**: Concise description
-- **Environment**: Python version, scipy version, OS
-- **Reproducible**: Minimal code that triggers bug
-- **Expected**: What should happen
-- **Actual**: What actually happens
-- **Traceback**: Full error message
-
-```markdown
-## Description
-BPSK demodulation returns wrong values when input contains NaN.
-
-## Environment
-- Python 3.11
-- NumPy 1.24
-- CommPy 0.1.2
-
-## Reproduction
-```python
-import numpy as np
-from commpy import BPSK_Modulator
-
-symbols = np.array([1+0j, np.nan, -1+0j])
-recovered = BPSK_Modulator.demodulate(symbols)
-print(recovered)  # Expected: [1, ?, 0]
-```
-
-## Feature Requests
-
-Include:
-- **Motivation**: Why is this needed?
-- **Use case**: How would you use it?
-- **Proposal**: How should it work?
-- **Alternatives**: Other ways to achieve this?
+Use the "New Issue" button on GitHub — it offers a
+[bug report](.github/ISSUE_TEMPLATE/bug_report.yml) and a
+[feature request](.github/ISSUE_TEMPLATE/feature_request.yml) form that
+prompt for the details needed to act on it (minimal reproduction,
+environment, motivation/use case, etc).
 
 ## Setting Up IDE
 

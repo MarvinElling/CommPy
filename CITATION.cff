@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use CommPy in your research, please cite it as below."
+type: software
+title: "CommPy"
+abstract: "A general-purpose Python library for communications engineering: channel coding, digital modulation, OFDM, information theory, queuing theory, and link-level simulation, built on NumPy/SciPy."
+authors:
+  - family-names: "Elling"
+    given-names: "Marvin"
+version: 1.0.0
+date-released: "2026-07-21"
+license: Apache-2.0
+repository-code: "https://github.com/MarvinElling/CommPy"
+url: "https://marvinelling.github.io/CommPy/"
+keywords:
+  - communications engineering
+  - digital signal processing
+  - channel coding
+  - forward error correction
+  - modulation
+  - ofdm
+  - information theory
+  - python
