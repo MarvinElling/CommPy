@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+#### AI-for-wireless (optional PyTorch layer) — `commpy.ml`
+- A new optional subpackage (`pip install "commpy[ml]"`), deliberately **not**
+  imported by `commpy/__init__` so the base install stays NumPy/SciPy-only and
+  `import commpy` never pulls in PyTorch. Import it explicitly as `commpy.ml`.
+- `awgn` / `normalize_power`: a differentiable complex AWGN channel and transmit
+  power constraint (autograd-friendly `(..., 2)` real/imag tensors).
+- `Autoencoder` (+ `train_autoencoder`, `block_error_rate`): an end-to-end
+  learned transmitter/receiver that learns a constellation and its detector by
+  training through the differentiable channel.
+- `NeuralDemapper` (+ `train_demapper`): a learned soft demapper for a
+  `Modulator`'s constellation, exposing the same `soft_demodulate` interface.
+- `NeuralMinSumDecoder` (+ `train_neural_min_sum`): an LDPC belief-propagation
+  decoder unrolled into a trainable weighted-min-sum network, reusing an
+  existing `LDPCCode`'s Tanner graph (unit weights reproduce classical min-sum).
+- CI gains a `test-ml-extra` job that installs CPU-only PyTorch and runs the
+  `commpy.ml` tests and `mypy` with torch present.
+
 ## [1.1.0] - 2026-07-26
 
 Adds the three modern standard forward-error-correcting codes — **LDPC**,

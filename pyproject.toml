@@ -64,6 +64,11 @@ Documentation = "https://marvinelling.github.io/CommPy/"
 fast = [
     "numba",
 ]
+# Optional AI-for-wireless layer (see commpy.ml). Kept separate so the base
+# install stays NumPy/SciPy-only and `import commpy` never pulls in PyTorch.
+ml = [
+    "torch",
+]
 dev = [
     "isort",
     "mypy",
@@ -125,6 +130,19 @@ disallow_untyped_calls = false
 # special functions), so untyped imports from it are expected, not an error.
 module = ["scipy.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# torch is an optional extra (commpy[ml]); when it isn't installed, treat its
+# imports as resolvable so the base mypy run over commpy.ml still passes.
+module = ["torch.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# PyTorch's nn.Module.__call__ and many tensor ops are annotated as returning
+# Any, so `warn_return_any` fights the framework throughout the (torch-only)
+# commpy.ml layer. Everything else stays strict.
+module = ["commpy._ml.*", "commpy.ml"]
+warn_return_any = false
 
 
 [tool.pydocstyle]
