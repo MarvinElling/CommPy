@@ -9,6 +9,7 @@ a convenience wrapper for the common modulate -> channel -> demodulate case.
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Protocol, runtime_checkable
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,6 +18,27 @@ from numpy.typing import ArrayLike, NDArray
 from scipy.stats import norm
 
 from commpy._modulation.base import Modulator
+
+
+@runtime_checkable
+class SoftInputCode(Protocol):
+    """Structural contract for a soft-input, LLR-decoded block code.
+
+    Satisfied by e.g. `LDPCCode`: a length-`n`, dimension-`k` code that encodes
+    a `k`-bit message into an `n`-bit codeword and decodes channel LLRs
+    (length `n`) back into a message (the first element of the returned tuple).
+    """
+
+    k: int
+    n: int
+
+    def encode(self, message: ArrayLike) -> NDArray[np.uint8]:
+        """Encode a length-`k` message into a length-`n` codeword."""
+        ...
+
+    def decode(self, llr: ArrayLike) -> tuple[NDArray[np.uint8], NDArray[np.uint8], int]:
+        """Decode length-`n` channel LLRs; the first tuple element is the message."""
+        ...
 
 
 @dataclass(frozen=True)
@@ -186,6 +208,74 @@ def simulate_ber(  # noqa: PLR0913 -- each parameter controls a distinct stoppin
     )
 
 
+def simulate_coded_ber(  # noqa: PLR0913 -- each parameter controls a distinct stopping/estimation criterion
+    code: SoftInputCode,
+    modulator: Modulator,
+    channel_fn: _ChannelFn,
+    snr_db_range: ArrayLike,
+    *,
+    blocks_per_batch: int = 200,
+    target_errors: int = 100,
+    max_trials: int = 10_000_000,
+    confidence: float = 0.95,
+    rng: np.random.Generator | None = None,
+) -> SimulationResult:
+    """Monte-Carlo bit-error-rate sweep for a soft-decision *coded* link.
+
+    Wires the full modulate -> channel -> `soft_demodulate` -> `code.decode`
+    chain into the generic `simulate_error_rate` core, so measuring a code's
+    coding gain is a one-liner. Errors are counted on the decoded information
+    bits (so `n_trials`/`n_errors` are message-bit counts).
+
+    The soft-demodulator noise variance is derived from the SNR assuming a
+    unit-average-energy constellation (`noise_var = 10 ** (-snr_db / 10)`),
+    matching `Channels.awgn`.
+
+    Args:
+        code: Any `SoftInputCode` (e.g. `LDPCCode`).
+        modulator: Any `Modulator` (e.g. `MPSKModulator(2)`).
+        channel_fn: `(symbols, snr_db, rng) -> received_symbols`, called
+            positionally so `Channels.awgn`/`Channels.rayleigh` work directly.
+        snr_db_range: SNR points (dB) to evaluate.
+        blocks_per_batch: Number of codeword blocks simulated per trial batch.
+        target_errors: See `simulate_error_rate`.
+        max_trials: See `simulate_error_rate` (counted in message bits).
+        confidence: See `simulate_error_rate`.
+        rng: Optional `np.random.Generator` for reproducibility.
+
+    Returns:
+        A `SimulationResult` in message bits.
+    """
+    bits_per_symbol = modulator.bits_per_symbol
+
+    def trial_fn(snr_db: float, trial_rng: np.random.Generator, n_trials: int) -> tuple[int, int]:
+        n_blocks = n_trials // code.k
+        if n_blocks == 0:
+            return 0, 0
+        noise_var = 10.0 ** (-snr_db / 10.0)
+        errors = 0
+        for _ in range(n_blocks):
+            message = trial_rng.integers(0, 2, code.k).astype(np.uint8)
+            codeword = code.encode(message)
+            pad = (-codeword.size) % bits_per_symbol
+            tx = np.concatenate([codeword, np.zeros(pad, dtype=np.uint8)]) if pad else codeword
+            received = channel_fn(modulator.modulate(tx), snr_db, trial_rng)
+            llr = modulator.soft_demodulate(received, noise_var)[:codeword.size]
+            message_hat = code.decode(llr)[0]
+            errors += int(np.sum(message_hat != message))
+        return errors, n_blocks * code.k
+
+    return simulate_error_rate(
+        trial_fn,
+        snr_db_range,
+        target_errors=target_errors,
+        max_trials=max_trials,
+        trials_per_batch=blocks_per_batch * code.k,
+        confidence=confidence,
+        rng=rng,
+    )
+
+
 def plot_waterfall(
     result: SimulationResult,
     theoretical: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
@@ -205,8 +295,11 @@ def plot_waterfall(
     if ax is None:
         _, ax = plt.subplots(figsize=(7, 5))
 
-    lower_err = result.error_rate - result.ci_lower
-    upper_err = result.ci_upper - result.error_rate
+    # Clamp at 0: for very small error rates the (asymmetric) Wilson interval
+    # can sit slightly to one side of the point estimate, and errorbar rejects
+    # negative bar lengths.
+    lower_err = np.clip(result.error_rate - result.ci_lower, 0.0, None)
+    upper_err = np.clip(result.ci_upper - result.error_rate, 0.0, None)
     ax.errorbar(
         result.snr_db, result.error_rate, yerr=np.vstack([lower_err, upper_err]),
         fmt='o-', capsize=3, label='measured',
@@ -222,4 +315,11 @@ def plot_waterfall(
     return ax
 
 
-__all__ = ['SimulationResult', 'plot_waterfall', 'simulate_ber', 'simulate_error_rate']
+__all__ = [
+    'SimulationResult',
+    'SoftInputCode',
+    'plot_waterfall',
+    'simulate_ber',
+    'simulate_coded_ber',
+    'simulate_error_rate',
+]

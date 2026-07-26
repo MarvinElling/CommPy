@@ -23,6 +23,15 @@ from ._channelCoding.convolutional.viterbi import viterbi_decode
 from ._channelCoding.interleaving.block import BlockInterleaver
 from ._channelCoding.interleaving.convolutional import ConvolutionalInterleaver
 
+# Channel coding: LDPC codes + belief-propagation decoding
+from ._channelCoding.ldpc.code import LDPCCode
+
+# Channel coding: polar codes + SC / CRC-aided SCL decoding
+from ._channelCoding.polar.code import PolarCode
+
+# Channel coding: turbo codes + iterative BCJR decoding
+from ._channelCoding.turbo.turbo import TurboCode
+
 # Channel impairment models (BSC, BEC, AWGN, fading, ...)
 from ._channels.channels import Channels
 
@@ -91,6 +100,7 @@ from ._simulation.link_simulation import (
     SimulationResult,
     plot_waterfall,
     simulate_ber,
+    simulate_coded_ber,
     simulate_error_rate,
 )
 
@@ -115,6 +125,7 @@ __all__ = [
     'GF2m',
     'HammingCode',
     'IQWaveform',
+    'LDPCCode',
     'MM1KQueue',
     'MM1Queue',
     'MMcQueue',
@@ -126,11 +137,13 @@ __all__ = [
     'OFDMModulator',
     'OOK_Modulator',
     'PSK_8_Modulator',
+    'PolarCode',
     'PrimeField',
     'QPSK_Modulator',
     'ReedSolomonCode',
     'SimulationResult',
     'Trellis',
+    'TurboCode',
     '__version__',
     'arithmetic_decode',
     'arithmetic_encode',
@@ -159,6 +172,7 @@ __all__ = [
     'root_raised_cosine_filter',
     'shannon_entropy',
     'simulate_ber',
+    'simulate_coded_ber',
     'simulate_error_rate',
     'viterbi_decode',
     'write_iq',
