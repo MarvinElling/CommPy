@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-07-26
+
+Adds the three modern standard forward-error-correcting codes — **LDPC**,
+**polar**, and **turbo** — that underpin 5G-NR/LTE/Wi-Fi/DVB, all consuming the
+existing soft-decision LLRs from `Modulator.soft_demodulate`. No breaking
+changes to the public API (`commpy.*`).
+
+### Added
+
+#### Channel coding (FEC) — `_channelCoding/`
+- **LDPC codes** (`ldpc/`): `LDPCCode` with belief-propagation decoding
+  (sum-product and normalized min-sum, fully vectorized). Constructors for
+  Gallager's regular ensemble (`from_gallager`) and quasi-cyclic protograph
+  lifting (`from_base_graph`), a systematic GF(2) generator that handles
+  rank-deficient parity-check matrices, and a ready rate-1/2 QC code
+  (`standards.rate_one_half_ldpc`).
+- **Polar codes** (`polar/`): `PolarCode` with successive-cancellation (SC) and
+  CRC-aided SC-*list* (CA-SCL) decoding, reusing the `CRC` class for the
+  list-selection check. Frozen-set construction by Bhattacharyya parameters or
+  Gaussian-approximation density evolution. The list decoder accumulates exact
+  log-domain path metrics, verified equal to maximum-likelihood decoding in the
+  test suite.
+- **Turbo codes** (`turbo/`): `TurboCode`, a rate-1/3 parallel-concatenated code
+  with recursive-systematic constituent encoders (`RSCTrellis`) and iterative
+  log-MAP (BCJR) decoding that exchanges extrinsic information through an
+  interleaver.
+
+#### Link-level simulation — `_simulation/`
+- `simulate_coded_ber`: Monte-Carlo BER sweep for any soft-input block code
+  (modulate → channel → `soft_demodulate` → decode), the coded counterpart of
+  `simulate_ber`.
+
+### Changed
+- `plot_waterfall` now clamps confidence-interval error bars at zero, so the
+  very small error rates typical of coded curves no longer trigger a matplotlib
+  "negative yerr" error.
+
+### Examples
+- `ldpc_coding_gain_demo.py`, `polar_scl_demo.py`, `turbo_coding_gain_demo.py`
+  — coded-vs-uncoded BER waterfalls demonstrating each code's coding gain.
+
 ## [1.0.0] - 2026-07-21
 
 A major expansion from a small modulation/channel-model library into a

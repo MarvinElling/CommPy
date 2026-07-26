@@ -13,7 +13,7 @@
 
 CommPy covers the classic communications-engineering stack, end to end:
 
-- **Channel coding (FEC)**: CRC (8/16/32), Hamming, generic cyclic codes, BCH, Reed-Solomon (error + erasure decoding), convolutional codes with hard/soft-decision Viterbi decoding, block and convolutional interleaving.
+- **Channel coding (FEC)**: CRC (8/16/32), Hamming, generic cyclic codes, BCH, Reed-Solomon (error + erasure decoding), convolutional codes with hard/soft-decision Viterbi decoding, **LDPC codes** (belief-propagation decoding; Gallager and quasi-cyclic constructions), **polar codes** (successive-cancellation and CRC-aided list decoding), **turbo codes** (parallel-concatenated RSC with iterative log-MAP/BCJR decoding), block and convolutional interleaving.
 - **Digital modulation**: a generic, Gray-coded M-PSK/M-QAM/M-PAM engine with soft-decision (LLR) demodulation, plus the original per-scheme classes (OOK, BPSK, ASK-2/4, QPSK, 8-PSK) kept for backward compatibility.
 - **Physical layer**: raised-cosine/root-raised-cosine pulse shaping, ZF/MMSE linear equalization, symbol-timing and carrier-frequency/-phase synchronization (Gardner TED, M-th-power CFO estimation, a Costas loop).
 - **OFDM**: modulator/demodulator with configurable active subcarriers and cyclic prefix, PAPR/PAPR-CCDF analysis.
@@ -23,13 +23,13 @@ CommPy covers the classic communications-engineering stack, end to end:
 - **Finite-field arithmetic**: prime fields GF(p) and binary extension fields GF(2^m), the algebraic foundation for BCH/Reed-Solomon.
 - **Waveform synthesis**: pulse-shaped, optionally up-converted IQ waveforms with eye-diagram/spectrum plotting.
 - **SDR interoperability**: read/write raw complex IQ recordings (GNU Radio-compatible) and SigMF (`.sigmf-data`/`.sigmf-meta`) recordings.
-- **Link-level simulation**: early-stopping Monte-Carlo BER/FER sweeps with Wilson-score confidence intervals and waterfall-curve plotting.
+- **Link-level simulation**: early-stopping Monte-Carlo BER/FER sweeps (uncoded, plus `simulate_coded_ber` for any soft-input code) with Wilson-score confidence intervals and waterfall-curve plotting.
 
 ## Features
 
 - **Modular by design** — each topic (coding, modulation, OFDM, info theory, queuing) is an independent subpackage; shared abstractions (`Modulator`, `FiniteField`) mean adding a new scheme reuses existing, tested machinery instead of duplicating it.
 - **Resource-efficient** — vectorized NumPy throughout; SciPy where it's a genuine win (FFT for OFDM, `solve_toeplitz` for MMSE equalization); the one inherently sequential hot loop (Viterbi decoding) gets optional Numba JIT acceleration via `pip install commpy[fast]`, with a correctness-preserving pure-Python fallback when it's not installed.
-- **Rigorously tested** — 300+ tests, including exhaustive brute-force cross-validation for algebraic decoders (BCH, Reed-Solomon) and Viterbi against maximum-likelihood search, and statistical BER-vs-SNR checks against theoretical curves.
+- **Rigorously tested** — 390+ tests, including exhaustive brute-force cross-validation for algebraic decoders (BCH, Reed-Solomon), Viterbi and polar list decoding against maximum-likelihood search, and statistical BER-vs-SNR checks (coded and uncoded) against theoretical curves.
 - **Fully typed** — complete type hints throughout, checked with `mypy --strict`.
 
 ## Installation
