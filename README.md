@@ -25,6 +25,7 @@ CommPy covers the classic communications-engineering stack, end to end:
 - **SDR interoperability**: read/write raw complex IQ recordings (GNU Radio-compatible) and SigMF (`.sigmf-data`/`.sigmf-meta`) recordings.
 - **Link-level simulation**: early-stopping Monte-Carlo BER/FER sweeps (uncoded, plus `simulate_coded_ber` for any soft-input code) with Wilson-score confidence intervals and waterfall-curve plotting.
 - **AI-for-wireless** (optional, `commpy[ml]`): a PyTorch layer under `commpy.ml` — a differentiable AWGN channel, an end-to-end learned autoencoder, a neural soft demapper, and a neural (trainable min-sum) LDPC decoder. Not imported by default, so the base install stays NumPy/SciPy-only.
+- **MCP server** (optional, `commpy[mcp]`): a `commpy-mcp` Model Context Protocol server exposing CommPy to AI agents — capability listing, channel capacity, and uncoded/coded BER sweeps.
 
 ## Features
 
@@ -49,6 +50,12 @@ With the optional AI-for-wireless layer (PyTorch, `commpy.ml`):
 
 ```bash
 pip install commpy[ml]
+```
+
+With the optional MCP server (`commpy-mcp`, for AI agents):
+
+```bash
+pip install commpy[mcp]
 ```
 
 Or install from source:

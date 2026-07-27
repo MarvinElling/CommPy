@@ -23,6 +23,21 @@ All notable changes to this project will be documented in this file.
 - CI gains a `test-ml-extra` job that installs CPU-only PyTorch and runs the
   `commpy.ml` tests and `mypy` with torch present.
 
+#### MCP server (optional) — `commpy-mcp`
+- A Model Context Protocol server (`pip install "commpy[mcp]"`, then run
+  `commpy-mcp`) exposing CommPy to AI agents: tools to list capabilities,
+  compute AWGN/BSC channel capacity, and run uncoded or coded
+  (LDPC/polar/turbo) BER sweeps. The tool logic is plain, importable functions
+  (`commpy.mcp_server`), fully tested without the `mcp` package.
+
+#### Documentation & tooling
+- A **Gallery** docs page with generated coding-gain and learned-constellation
+  figures.
+- A **benchmark suite** (`benchmarks/`, pytest-benchmark) for the LDPC, polar,
+  turbo, and Viterbi decoders and QAM (run with
+  `pytest benchmarks/ --benchmark-only --no-cov`); bare `pytest` runs the
+  correctness suite only (`testpaths = ["tests"]`).
+
 ## [1.1.0] - 2026-07-26
 
 Adds the three modern standard forward-error-correcting codes — **LDPC**,
