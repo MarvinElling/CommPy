@@ -477,8 +477,8 @@ write_sigmf('capture', symbols, sample_rate=1e6, center_freq=915e6, description=
 recovered, meta = read_sigmf('capture')  # -> (ndarray, dict); meta['global']['core:sample_rate']
 ```
 
-See [`examples/ber_waterfall_simulation.py`](../examples/ber_waterfall_simulation.py) and
-[`examples/sigmf_iq_io.py`](../examples/sigmf_iq_io.py) for full runnable versions.
+See [`examples/ber_waterfall_simulation.py`](https://github.com/MarvinElling/CommPy/blob/main/examples/ber_waterfall_simulation.py) and
+[`examples/sigmf_iq_io.py`](https://github.com/MarvinElling/CommPy/blob/main/examples/sigmf_iq_io.py) for full runnable versions.
 
 ---
 
