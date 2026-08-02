@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+#### MIMO — `commpy` (multiple-antenna support)
+- `rayleigh_channel_matrix` / `mimo_awgn` / `mimo_noise_variance`: an i.i.d.
+  Rayleigh MIMO channel matrix and a flat-fading `y = H x + n` channel.
+- `alamouti_encode` / `alamouti_decode`: rate-1 Alamouti space-time block coding
+  (2 transmit antennas, any number of receive antennas) for transmit diversity.
+- Spatial-multiplexing detectors: `zf_detector`, `mmse_detector`, `ml_detector`
+  (exhaustive maximum-likelihood), and `kbest_detector` (a K-best sphere decoder,
+  equal to ML for a large enough list). K-best is cross-validated against ML.
+- `mimo_capacity` / `ergodic_mimo_capacity`: deterministic and fading-averaged
+  MIMO channel capacity.
+
 #### AI-for-wireless (optional PyTorch layer) — `commpy.ml`
 - A new optional subpackage (`pip install "commpy[ml]"`), deliberately **not**
   imported by `commpy/__init__` so the base install stays NumPy/SciPy-only and

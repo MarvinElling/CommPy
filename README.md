@@ -17,6 +17,7 @@ CommPy covers the classic communications-engineering stack, end to end:
 - **Digital modulation**: a generic, Gray-coded M-PSK/M-QAM/M-PAM engine with soft-decision (LLR) demodulation, plus the original per-scheme classes (OOK, BPSK, ASK-2/4, QPSK, 8-PSK) kept for backward compatibility.
 - **Physical layer**: raised-cosine/root-raised-cosine pulse shaping, ZF/MMSE linear equalization, symbol-timing and carrier-frequency/-phase synchronization (Gardner TED, M-th-power CFO estimation, a Costas loop).
 - **OFDM**: modulator/demodulator with configurable active subcarriers and cyclic prefix, PAPR/PAPR-CCDF analysis.
+- **MIMO**: i.i.d. Rayleigh channel model, Alamouti space-time block coding (transmit diversity), spatial-multiplexing detectors (zero-forcing, MMSE, maximum-likelihood, K-best sphere), and deterministic/ergodic MIMO capacity.
 - **Channel models**: BSC, BEC, AWGN, Rayleigh/Rician fading, Z-channel, Gilbert-Elliott bursty channel, uniform quantization.
 - **Information theory**: Shannon/binary entropy, mutual information, channel capacity (closed-form BSC/AWGN and Blahut-Arimoto for general DMCs), Huffman and arithmetic source coding, binary rate-distortion.
 - **Queuing theory**: M/M/1, M/M/1/K, M/M/c closed-form performance models.
