@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.2.0] - 2026-07-27
+
+Adds **MIMO** (multiple-antenna) support, an optional **AI-for-wireless** PyTorch
+layer (`commpy.ml`), and an optional **MCP server** (`commpy-mcp`) that exposes
+CommPy to AI agents, plus a docs gallery and a benchmark suite. No breaking
+changes to the public API (`commpy.*`).
 
 ### Added
 

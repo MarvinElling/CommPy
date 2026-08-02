@@ -8,7 +8,7 @@ name = "commpy"
 authors = [
     {name = "Marvin Elling", email = "mane.der@web.de"},
 ]
-version = "1.1.0"
+version = "1.2.0"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
