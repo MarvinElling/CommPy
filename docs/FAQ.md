@@ -91,7 +91,7 @@ See [GETTING_STARTED.md#troubleshooting](GETTING_STARTED.md#troubleshooting) for
 | Amplitude-based | ASK-2 or ASK-4 |
 | Optical communication | OOK |
 
-See [USER_GUIDE.md#modulation--demodulation](USER_GUIDE.md#modulation--demodulation) for detailed comparisons.
+See [USER_GUIDE.md#modulation-demodulation](USER_GUIDE.md#modulation-demodulation) for detailed comparisons.
 
 ---
 
@@ -176,7 +176,7 @@ Channels.awgn(signal, snr_db=5)
 Channels.awgn(signal, snr_db=0)
 ```
 
-See [USER_GUIDE.md#awgn](USER_GUIDE.md#awgn---additive-white-gaussian-noise) for guidance.
+See [USER_GUIDE.md#awgn](USER_GUIDE.md#awgn-additive-white-gaussian-noise) for guidance.
 
 ---
 
@@ -215,7 +215,7 @@ noisy2 = Channels.awgn(signal, snr_db=10, rng=rng)
 print(np.allclose(noisy1, noisy2))  # True
 ```
 
-See [GETTING_STARTED.md#tutorial-6](GETTING_STARTED.md#tutorial-6-reproducible-results-with-rng).
+See [GETTING_STARTED.md#tutorial-6](GETTING_STARTED.md#tutorial-6-using-reproducible-results-with-rng).
 
 ---
 

@@ -45,3 +45,23 @@ jobs:
           pip install -e ".[dev,fast]"
       - name: Test with pytest (numba-accelerated path)
         run: pytest
+
+  test-ml-extra:
+    # Exercise the optional PyTorch AI-for-wireless layer (commpy.ml). Installs
+    # the CPU-only torch build to keep the job lightweight.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package (dev extras + CPU PyTorch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev]"
+      - name: Type-check with mypy (torch present)
+        run: mypy
+      - name: Test the ML layer with pytest
+        run: pytest tests/_ml

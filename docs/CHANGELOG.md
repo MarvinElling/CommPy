@@ -2,6 +2,58 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-07-27
+
+Adds **MIMO** (multiple-antenna) support, an optional **AI-for-wireless** PyTorch
+layer (`commpy.ml`), and an optional **MCP server** (`commpy-mcp`) that exposes
+CommPy to AI agents, plus a docs gallery and a benchmark suite. No breaking
+changes to the public API (`commpy.*`).
+
+### Added
+
+#### MIMO — `commpy` (multiple-antenna support)
+- `rayleigh_channel_matrix` / `mimo_awgn` / `mimo_noise_variance`: an i.i.d.
+  Rayleigh MIMO channel matrix and a flat-fading `y = H x + n` channel.
+- `alamouti_encode` / `alamouti_decode`: rate-1 Alamouti space-time block coding
+  (2 transmit antennas, any number of receive antennas) for transmit diversity.
+- Spatial-multiplexing detectors: `zf_detector`, `mmse_detector`, `ml_detector`
+  (exhaustive maximum-likelihood), and `kbest_detector` (a K-best sphere decoder,
+  equal to ML for a large enough list). K-best is cross-validated against ML.
+- `mimo_capacity` / `ergodic_mimo_capacity`: deterministic and fading-averaged
+  MIMO channel capacity.
+
+#### AI-for-wireless (optional PyTorch layer) — `commpy.ml`
+- A new optional subpackage (`pip install "commpy[ml]"`), deliberately **not**
+  imported by `commpy/__init__` so the base install stays NumPy/SciPy-only and
+  `import commpy` never pulls in PyTorch. Import it explicitly as `commpy.ml`.
+- `awgn` / `normalize_power`: a differentiable complex AWGN channel and transmit
+  power constraint (autograd-friendly `(..., 2)` real/imag tensors).
+- `Autoencoder` (+ `train_autoencoder`, `block_error_rate`): an end-to-end
+  learned transmitter/receiver that learns a constellation and its detector by
+  training through the differentiable channel.
+- `NeuralDemapper` (+ `train_demapper`): a learned soft demapper for a
+  `Modulator`'s constellation, exposing the same `soft_demodulate` interface.
+- `NeuralMinSumDecoder` (+ `train_neural_min_sum`): an LDPC belief-propagation
+  decoder unrolled into a trainable weighted-min-sum network, reusing an
+  existing `LDPCCode`'s Tanner graph (unit weights reproduce classical min-sum).
+- CI gains a `test-ml-extra` job that installs CPU-only PyTorch and runs the
+  `commpy.ml` tests and `mypy` with torch present.
+
+#### MCP server (optional) — `commpy-mcp`
+- A Model Context Protocol server (`pip install "commpy[mcp]"`, then run
+  `commpy-mcp`) exposing CommPy to AI agents: tools to list capabilities,
+  compute AWGN/BSC channel capacity, and run uncoded or coded
+  (LDPC/polar/turbo) BER sweeps. The tool logic is plain, importable functions
+  (`commpy.mcp_server`), fully tested without the `mcp` package.
+
+#### Documentation & tooling
+- A **Gallery** docs page with generated coding-gain and learned-constellation
+  figures.
+- A **benchmark suite** (`benchmarks/`, pytest-benchmark) for the LDPC, polar,
+  turbo, and Viterbi decoders and QAM (run with
+  `pytest benchmarks/ --benchmark-only --no-cov`); bare `pytest` runs the
+  correctness suite only (`testpaths = ["tests"]`).
+
 ## [1.1.0] - 2026-07-26
 
 Adds the three modern standard forward-error-correcting codes — **LDPC**,

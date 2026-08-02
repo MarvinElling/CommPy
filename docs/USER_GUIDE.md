@@ -5,11 +5,11 @@ A comprehensive guide to understanding and using CommPy's features.
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Modulation & Demodulation](#modulation--demodulation)
+2. [Modulation & Demodulation](#modulation-demodulation)
 3. [Channel Models](#channel-models)
 4. [Information Theory](#information-theory)
 5. [Waveform Generation](#waveform-generation)
-6. [SDR Interoperability & Link Simulation](#sdr-interoperability--link-simulation)
+6. [SDR Interoperability & Link Simulation](#sdr-interoperability-link-simulation)
 7. [Practical Applications](#practical-applications)
 8. [Best Practices](#best-practices)
 

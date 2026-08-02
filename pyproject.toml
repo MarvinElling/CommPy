@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "setuptools-scm[toml]"]
+requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 
@@ -8,7 +8,7 @@ name = "commpy"
 authors = [
     {name = "Marvin Elling", email = "mane.der@web.de"},
 ]
-version = "1.1.0"
+version = "1.2.0"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -57,6 +57,10 @@ Issues = "https://github.com/MarvinElling/CommPy/issues"
 Changelog = "https://github.com/MarvinElling/CommPy/blob/main/docs/CHANGELOG.md"
 Documentation = "https://marvinelling.github.io/CommPy/"
 
+[project.scripts]
+# MCP server exposing CommPy to AI agents (requires the `mcp` extra).
+commpy-mcp = "commpy.mcp_server:main"
+
 [project.optional-dependencies]
 # Optional JIT acceleration (see commpy._utils.numba_compat). Kept separate
 # from `dev` so the numba-absent fallback path is what contributors get by
@@ -64,10 +68,20 @@ Documentation = "https://marvinelling.github.io/CommPy/"
 fast = [
     "numba",
 ]
+# Optional AI-for-wireless layer (see commpy.ml). Kept separate so the base
+# install stays NumPy/SciPy-only and `import commpy` never pulls in PyTorch.
+ml = [
+    "torch",
+]
+# Optional MCP server (see commpy.mcp_server); exposes the `commpy-mcp` command.
+mcp = [
+    "mcp>=1.0",
+]
 dev = [
     "isort",
     "mypy",
     "pytest",
+    "pytest-benchmark",
     "pytest-cov",
     "ruff",
     "yapf",
@@ -126,6 +140,25 @@ disallow_untyped_calls = false
 module = ["scipy.*"]
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+# torch is an optional extra (commpy[ml]); when it isn't installed, treat its
+# imports as resolvable so the base mypy run over commpy.ml still passes.
+module = ["torch.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# mcp is an optional extra (commpy[mcp]); imported lazily in commpy.mcp_server,
+# so resolve it as missing-ok when the extra isn't installed.
+module = ["mcp.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# PyTorch's nn.Module.__call__ and many tensor ops are annotated as returning
+# Any, so `warn_return_any` fights the framework throughout the (torch-only)
+# commpy.ml layer. Everything else stays strict.
+module = ["commpy._ml.*", "commpy.ml"]
+warn_return_any = false
+
 
 [tool.pydocstyle]
 convention = "google"
@@ -134,6 +167,9 @@ add_select = ["D204", "D400", "D401", "D404", "D413"]
 
 [tool.pytest.ini_options]
 addopts = ["--cov", "--verbose"]
+# Bare `pytest` runs the correctness suite only; the performance benchmarks in
+# benchmarks/ are opt-in (`pytest benchmarks/ --benchmark-only --no-cov`).
+testpaths = ["tests"]
 
 
 [tool.ruff]
@@ -164,6 +200,9 @@ ignore = [
 # full annotations (incl. on pytest fixture parameters) on every test is pure
 # ceremony. Standard practice in numpy/scipy/pandas-style test suites.
 "tests/**" = ["ANN001", "ANN201", "ANN202", "D100", "D101", "D102", "D103", "D104"]
+# Benchmarks are dev tooling in the same spirit as the tests: intent-documenting
+# names, pytest-benchmark fixtures, no public API to annotate.
+"benchmarks/**" = ["ANN001", "ANN201", "ANN202", "D103"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -176,9 +215,6 @@ inline-quotes = "single"
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-
-[tool.setuptools_scm]
 
 
 [tool.yapf]

@@ -57,6 +57,12 @@ from ._informationTheory.source_coding import (
     huffman_encode,
 )
 
+# MIMO: channel model, Alamouti STBC, spatial-multiplexing detectors, capacity
+from ._mimo.capacity import ergodic_mimo_capacity, mimo_capacity
+from ._mimo.channel import mimo_awgn, mimo_noise_variance, rayleigh_channel_matrix
+from ._mimo.detectors import kbest_detector, ml_detector, mmse_detector, zf_detector
+from ._mimo.stbc import alamouti_decode, alamouti_encode
+
 # Digital modulation: generic, Gray-coded engine (preferred for new code)
 from ._modulation.base import Modulator
 
@@ -145,6 +151,8 @@ __all__ = [
     'Trellis',
     'TurboCode',
     '__version__',
+    'alamouti_decode',
+    'alamouti_encode',
     'arithmetic_decode',
     'arithmetic_encode',
     'binary_entropy',
@@ -152,12 +160,19 @@ __all__ = [
     'channel_capacity_bsc',
     'channel_capacity_dmc',
     'costas_loop_bpsk',
+    'ergodic_mimo_capacity',
     'estimate_cfo_mth_power',
     'gardner_timing_error',
     'huffman_codes',
     'huffman_decode',
     'huffman_encode',
     'is_prime',
+    'kbest_detector',
+    'mimo_awgn',
+    'mimo_capacity',
+    'mimo_noise_variance',
+    'ml_detector',
+    'mmse_detector',
     'mmse_equalizer',
     'modinv',
     'mutual_information',
@@ -167,6 +182,7 @@ __all__ = [
     'plot_waterfall',
     'raised_cosine_filter',
     'rate_distortion_binary',
+    'rayleigh_channel_matrix',
     'read_iq',
     'read_sigmf',
     'root_raised_cosine_filter',
@@ -177,5 +193,6 @@ __all__ = [
     'viterbi_decode',
     'write_iq',
     'write_sigmf',
+    'zf_detector',
     'zf_equalizer',
 ]
