@@ -113,6 +113,19 @@ from ._simulation.link_simulation import (
 # Math utilities
 from ._utils.maths import is_prime, modinv
 
+# Visualization: signal- and modulation-domain plots
+from ._viz.signals import (
+    plot_constellation,
+    plot_eye_diagram,
+    plot_filter_response,
+    plot_iq_time,
+    plot_psd,
+    plot_spectrogram,
+)
+
+# Visualization: shared palette and axes styling
+from ._viz.style import commpy_style, series_colors
+
 # Waveform synthesis
 from ._waves.iq_wave import IQWaveform
 
@@ -159,6 +172,7 @@ __all__ = [
     'channel_capacity_awgn',
     'channel_capacity_bsc',
     'channel_capacity_dmc',
+    'commpy_style',
     'costas_loop_bpsk',
     'ergodic_mimo_capacity',
     'estimate_cfo_mth_power',
@@ -179,6 +193,12 @@ __all__ = [
     'papr',
     'papr_ccdf',
     'papr_db',
+    'plot_constellation',
+    'plot_eye_diagram',
+    'plot_filter_response',
+    'plot_iq_time',
+    'plot_psd',
+    'plot_spectrogram',
     'plot_waterfall',
     'raised_cosine_filter',
     'rate_distortion_binary',
@@ -186,6 +206,7 @@ __all__ = [
     'read_iq',
     'read_sigmf',
     'root_raised_cosine_filter',
+    'series_colors',
     'shannon_entropy',
     'simulate_ber',
     'simulate_coded_ber',
