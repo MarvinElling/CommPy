@@ -113,6 +113,9 @@ from ._simulation.link_simulation import (
 # Math utilities
 from ._utils.maths import is_prime, modinv
 
+# Visualization: animated processes
+from ._viz.animation import animate_constellation, animate_decoding, animate_viterbi
+
 # Visualization: forward-error-correction structure
 from ._viz.coding import (
     plot_frozen_bits,
@@ -196,6 +199,9 @@ __all__ = [
     '__version__',
     'alamouti_decode',
     'alamouti_encode',
+    'animate_constellation',
+    'animate_decoding',
+    'animate_viterbi',
     'arithmetic_decode',
     'arithmetic_encode',
     'binary_entropy',

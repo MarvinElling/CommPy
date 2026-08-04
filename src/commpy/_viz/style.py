@@ -11,13 +11,12 @@ Color therefore tracks the entity, not its rank: dropping a curve from a
 comparison never repaints the survivors.
 
 Nothing here mutates matplotlib's global state. The plotting functions pass
-colors explicitly, and `commpy_style()` merely *returns* an rcParams mapping for
-callers who want the same look for their own figures::
+colors explicitly, and `commpy_style()` is an opt-in scope for callers who want
+the same look for their own figures::
 
-    import matplotlib.pyplot as plt
     from commpy import commpy_style
 
-    with plt.rc_context(commpy_style()):
+    with commpy_style():
         ...
 """
 
@@ -29,6 +28,7 @@ import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib.axes import Axes
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.figure import Figure
 
 # Categorical slots, in assignment order. Validated as a set: worst adjacent
 # color-vision-deficient separation dE 9.1 (OKLab x100, >= 8 target), worst
@@ -151,6 +151,18 @@ def _apply_chrome(ax: Axes) -> None:
     ax.tick_params(colors=TEXT_MUTED, labelcolor=TEXT_MUTED)
 
 
+def _figure_axes(figsize: tuple[float, float] = (7.0, 5.0)) -> tuple[Figure, Axes]:
+    """Create a styled figure and axes, returning both.
+
+    Animations need the `Figure` itself, and reaching for it through
+    `Axes.figure` yields a `Figure | SubFigure` union that callers then have to
+    narrow.
+    """
+    figure, ax = plt.subplots(figsize=figsize)
+    _apply_chrome(ax)
+    return figure, ax
+
+
 def _axes(ax: Axes | None, figsize: tuple[float, float] = (7.0, 5.0)) -> Axes:
     """Return `ax`, or a new styled axes when it is `None`.
 
@@ -166,9 +178,7 @@ def _axes(ax: Axes | None, figsize: tuple[float, float] = (7.0, 5.0)) -> Axes:
     """
     if ax is not None:
         return ax
-    _, new_ax = plt.subplots(figsize=figsize)
-    _apply_chrome(new_ax)
-    return new_ax
+    return _figure_axes(figsize)[1]
 
 
 def _finalize(  # noqa: PLR0913 -- one keyword per axes decoration; grouping them would only add indirection
