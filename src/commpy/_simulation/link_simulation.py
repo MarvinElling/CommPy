@@ -280,6 +280,9 @@ def plot_waterfall(
     result: SimulationResult,
     theoretical: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = None,
     ax: Axes | None = None,
+    *,
+    label: str = 'measured',
+    color: str | None = None,
 ) -> Axes:
     """Plot a BER/FER-vs-SNR waterfall curve with confidence-interval error bars.
 
@@ -288,6 +291,10 @@ def plot_waterfall(
         theoretical: Optional `snr_db -> error_rate` closed-form reference
             curve, overlaid for comparison.
         ax: Optional axes to plot into; a new figure/axes is created if omitted.
+        label: Legend entry for this curve. Give each curve its own when
+            calling repeatedly with the same `ax` (see
+            `plot_error_rate_comparison`, which does exactly that).
+        color: Optional explicit color; by default matplotlib's cycle picks one.
 
     Returns:
         The axes the curve was plotted on.
@@ -302,10 +309,11 @@ def plot_waterfall(
     upper_err = np.clip(result.ci_upper - result.error_rate, 0.0, None)
     ax.errorbar(
         result.snr_db, result.error_rate, yerr=np.vstack([lower_err, upper_err]),
-        fmt='o-', capsize=3, label='measured',
+        fmt='o-', capsize=3, label=label, color=color,
     )
     if theoretical is not None:
-        ax.plot(result.snr_db, theoretical(result.snr_db), '--', label='theoretical')
+        ax.plot(result.snr_db, theoretical(result.snr_db), '--', label='theoretical',
+                color=color)
     ax.set_yscale('log')
     ax.set_xlabel('SNR (dB)')
     ax.set_ylabel('Error rate')

@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from commpy._viz.signals import plot_eye_diagram, plot_iq_time
+
 
 class IQWaveform:
     """Generates and plots a pulse-shaped, optionally up-converted IQ waveform."""
@@ -79,44 +81,41 @@ class IQWaveform:
         return t, s, s_i, s_q
 
     def plot_waveform(self) -> None:
-        r"""Plot the analog transmit signal \tilde{S}(t)."""
-        plt.figure(figsize=(10, 3))
-        plt.plot(self.t, self.s, lw=1.2)
-        plt.xlabel('t [s]')
-        plt.ylabel('$\\tilde{S}(t)$')
-        plt.title('Bandpass IQ Modulated Signal')
-        plt.grid(True)
-        plt.tight_layout()
+        r"""Plot the analog transmit signal \tilde{S}(t).
+
+        Convenience wrapper that opens a window immediately. For a composable
+        version -- one that draws into an axes you supply and returns it --
+        use `commpy.plot_iq_time`.
+        """
+        ax = plot_iq_time(self.s, self.fs)
+        ax.set_title('Bandpass IQ Modulated Signal')
+        ax.set_ylabel('$\\tilde{S}(t)$')
         plt.show()
 
     def plot_IQ_baseband(self) -> None:  # noqa: N802 -- public API name kept for backward compatibility
-        """Plot baseband I/Q components as a function of time."""
-        plt.figure(figsize=(10, 4))
-        plt.plot(self.t, self.s_I, label='I(t)', lw=1.2)
-        plt.plot(self.t, self.s_Q, label='Q(t)', lw=1.2)
-        plt.xlabel('t [s]')
-        plt.ylabel('Amplitude')
-        plt.title('Baseband I/Q Components (Pulse Shaped)')
-        plt.grid(True)
-        plt.legend()
-        plt.tight_layout()
+        """Plot baseband I/Q components as a function of time.
+
+        Convenience wrapper; see `commpy.plot_iq_time` for the composable form.
+        """
+        ax = plot_iq_time(self.s_I + 1j * self.s_Q, self.fs)
+        ax.set_title('Baseband I/Q Components (Pulse Shaped)')
         plt.show()
 
     def plot_eye(self, n_traces: int = 2) -> None:
         """Plot an eye diagram for I(t).
+
+        Convenience wrapper; see `commpy.plot_eye_diagram` for the composable
+        form, which also takes the trace count as a cap rather than as an
+        offset.
 
         Args:
             n_traces: Number of trailing symbol periods to omit from the plot
                 (kept for consistency with earlier trace windows).
         """
         period = int(self.T * self.fs)
-        plt.figure()
-        for k in range(len(self.s_I) // period - n_traces):
-            plt.plot(np.arange(period) / self.fs, self.s_I[k * period:(k + 1) * period], 'b')
-        plt.xlabel('t [symbol period]')
-        plt.title('Eye diagram (I)')
-        plt.grid(True)
-        plt.tight_layout()
+        usable = (len(self.s_I) // period - n_traces) * period
+        ax = plot_eye_diagram(self.s_I[:usable + 1], period)
+        ax.set_title('Eye diagram (I)')
         plt.show()
 
 

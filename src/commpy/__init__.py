@@ -145,6 +145,17 @@ from ._viz.signals import (
 # Visualization: shared palette and axes styling
 from ._viz.style import commpy_style, series_colors
 
+# Visualization: system- and channel-level plots
+from ._viz.system import (
+    plot_capacity_curves,
+    plot_channel_response,
+    plot_equalizer_response,
+    plot_error_rate_comparison,
+    plot_mimo_capacity_cdf,
+    plot_ofdm_grid,
+    plot_papr_ccdf,
+)
+
 # Waveform synthesis
 from ._waves.iq_wave import IQWaveform
 
@@ -212,8 +223,12 @@ __all__ = [
     'papr',
     'papr_ccdf',
     'papr_db',
+    'plot_capacity_curves',
+    'plot_channel_response',
     'plot_constellation',
     'plot_decoder_convergence',
+    'plot_equalizer_response',
+    'plot_error_rate_comparison',
     'plot_exit_chart',
     'plot_eye_diagram',
     'plot_filter_response',
@@ -221,6 +236,9 @@ __all__ = [
     'plot_interleaver',
     'plot_iq_time',
     'plot_llr_histogram',
+    'plot_mimo_capacity_cdf',
+    'plot_ofdm_grid',
+    'plot_papr_ccdf',
     'plot_parity_check',
     'plot_polar_reliabilities',
     'plot_psd',
