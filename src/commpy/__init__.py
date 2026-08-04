@@ -113,6 +113,25 @@ from ._simulation.link_simulation import (
 # Math utilities
 from ._utils.maths import is_prime, modinv
 
+# Visualization: forward-error-correction structure
+from ._viz.coding import (
+    plot_frozen_bits,
+    plot_interleaver,
+    plot_parity_check,
+    plot_polar_reliabilities,
+    plot_tanner_graph,
+    plot_trellis,
+)
+
+# Visualization: decoder diagnostics
+from ._viz.decoding import (
+    plot_decoder_convergence,
+    plot_exit_chart,
+    plot_llr_histogram,
+    plot_scl_paths,
+    plot_viterbi_paths,
+)
+
 # Visualization: signal- and modulation-domain plots
 from ._viz.signals import (
     plot_constellation,
@@ -194,11 +213,22 @@ __all__ = [
     'papr_ccdf',
     'papr_db',
     'plot_constellation',
+    'plot_decoder_convergence',
+    'plot_exit_chart',
     'plot_eye_diagram',
     'plot_filter_response',
+    'plot_frozen_bits',
+    'plot_interleaver',
     'plot_iq_time',
+    'plot_llr_histogram',
+    'plot_parity_check',
+    'plot_polar_reliabilities',
     'plot_psd',
+    'plot_scl_paths',
     'plot_spectrogram',
+    'plot_tanner_graph',
+    'plot_trellis',
+    'plot_viterbi_paths',
     'plot_waterfall',
     'raised_cosine_filter',
     'rate_distortion_binary',
