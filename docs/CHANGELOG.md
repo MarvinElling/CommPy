@@ -2,6 +2,70 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+Adds a **visualization suite**: around thirty plotting functions spanning the
+signal, the code, the decoder, and the link, plus animations and an optional
+interactive backend. No breaking changes to the public API (`commpy.*`).
+
+### Added
+
+#### Visualization — `commpy` (new `_viz` subpackage)
+- **Signal & modulation**: `plot_constellation` (with Gray bit labels and
+  nearest-neighbor decision regions), `plot_eye_diagram`, `plot_psd`,
+  `plot_spectrogram`, `plot_iq_time`, `plot_filter_response`.
+- **FEC structure**: `plot_parity_check`, `plot_tanner_graph` (hand-laid
+  bipartite layout, no networkx dependency), `plot_trellis` (`Trellis` and
+  `RSCTrellis`), `plot_polar_reliabilities`, `plot_frozen_bits`,
+  `plot_interleaver`.
+- **Decoder diagnostics**: `plot_llr_histogram`, `plot_decoder_convergence`,
+  `plot_exit_chart` (Monte-Carlo measured on both axes, no fitted J-function),
+  `plot_viterbi_paths`, `plot_scl_paths`.
+- **System & channel**: `plot_error_rate_comparison`, `plot_channel_response`,
+  `plot_equalizer_response`, `plot_ofdm_grid`, `plot_papr_ccdf`,
+  `plot_mimo_capacity_cdf`, `plot_capacity_curves`.
+- **Animations** (returning `FuncAnimation`): `animate_constellation`,
+  `animate_decoding`, `animate_viterbi`.
+- **Styling**: `commpy_style` (an opt-in context manager for your own figures)
+  and `series_colors`. The palette is eight fixed hues, validated so adjacent
+  pairs stay separable under protanopia, deuteranopia, and tritanopia; colors
+  track the entity rather than its rank, so dropping a curve from a comparison
+  never repaints the survivors.
+- Every plotting function follows the contract `plot_*(data, ..., ax=None) ->
+  Axes`: it draws into a supplied axes or creates one, and never calls
+  `plt.show()`.
+- **Optional interactive backend** (`pip install "commpy[viz]"`):
+  `plotly_constellation`, `plotly_eye_diagram`, `plotly_psd`,
+  `plotly_waterfall`, `plotly_tanner_graph`. Plotly is imported inside the
+  function bodies, so `import commpy` works and stays fast without the extra.
+- New `examples/visualization_demo.py` (also regenerates the gallery images
+  with `--save DIR`), an expanded `docs/gallery.md`, and a `test-viz-extra` CI
+  job.
+
+### Changed
+- `plot_waterfall` gains `label` and `color` keywords (both previously
+  hardcoded), so several curves can share one axes. This is what
+  `plot_error_rate_comparison` builds on, which is why its comparison curves
+  keep the same Wilson-score confidence intervals a single-curve plot shows.
+- `IQWaveform.plot_waveform` / `plot_IQ_baseband` / `plot_eye` now delegate to
+  the new functions. Their signatures, their `plt.show()`, and their `None`
+  return are unchanged.
+
+### Notes
+- Two plots are deliberately narrower than their names suggest, because the
+  library does not yet support more. `plot_equalizer_response` is a *static*
+  design plot (channel, equalizer, combined response, residual ISI): CommPy's
+  equalizers solve against a known channel and there is no adaptive LMS/RLS
+  equalizer, so there is no convergence trajectory to draw.
+  `plot_channel_response` takes caller-supplied taps, since the fading models
+  in `Channels` are flat and carry no delay profile.
+- `plot_polar_reliabilities` plots each construction's *rank* rather than its
+  raw score: Bhattacharyya scores live in `[-1, 0]` and Gaussian-approximation
+  scores are unbounded mean LLRs, so a shared linear axis would be meaningless.
+  Rank is also what the frozen-set selection consumes.
+- Removes "visualization best practices" from the documentation-gaps list
+  below.
+
 ## [1.2.0] - 2026-07-27
 
 Adds **MIMO** (multiple-antenna) support, an optional **AI-for-wireless** PyTorch
@@ -292,7 +356,6 @@ Items on the roadmap:
 - Advanced filter design for pulse shaping
 - Custom modulation creation
 - Performance optimization guide
-- Visualization best practices
 - Integration with simulink/other tools
 
 Please open an issue if you find gaps!

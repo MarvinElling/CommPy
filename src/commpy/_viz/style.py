@@ -10,20 +10,25 @@ adjacent pair stays separable under protanopia, deuteranopia, and tritanopia.
 Color therefore tracks the entity, not its rank: dropping a curve from a
 comparison never repaints the survivors.
 
-Nothing here mutates matplotlib's global state. The plotting functions pass
-colors explicitly, and `commpy_style()` is an opt-in scope for callers who want
-the same look for their own figures::
+Importing this module mutates no matplotlib global state: the plotting functions
+pass their colors explicitly rather than relying on rcParams. `commpy_style()`
+is an opt-in scope for callers who want the same look for their own figures::
 
     from commpy import commpy_style
 
     with commpy_style():
         ...
+
+Calling it registers CommPy's two colormaps by name (matplotlib's `image.cmap`
+setting is a registry lookup, not an object), which is the one global effect in
+this module -- and it only happens once a caller asks for the style.
 """
 
 import warnings
 from contextlib import AbstractContextManager
 from typing import Any, cast
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib.axes import Axes
@@ -88,7 +93,7 @@ _STYLE_RCPARAMS: dict[str, Any] = {
     'figure.facecolor': SURFACE,
     'grid.color': GRID_COLOR,
     'grid.linewidth': 0.6,
-    'image.cmap': SEQUENTIAL_CMAP,
+    'image.cmap': SEQUENTIAL_CMAP.name,
     'legend.frameon': False,
     'lines.linewidth': 1.8,
     'lines.markersize': 5,
@@ -97,6 +102,13 @@ _STYLE_RCPARAMS: dict[str, Any] = {
     'xtick.color': TEXT_MUTED,
     'ytick.color': TEXT_MUTED,
 }
+
+
+def _register_colormaps() -> None:
+    """Register CommPy's colormaps under their names, if they are not already."""
+    for colormap in (SEQUENTIAL_CMAP, DIVERGING_CMAP):
+        if colormap.name not in mpl.colormaps:
+            mpl.colormaps.register(colormap)
 
 
 def commpy_style() -> AbstractContextManager[None]:
@@ -113,6 +125,11 @@ def commpy_style() -> AbstractContextManager[None]:
         A context manager applying the palette cycle, the recessive grid and
         axes, and the muted tick/label ink for its duration.
     """
+    # rcParams stores image.cmap as a *name* that matplotlib resolves through
+    # its global registry, so the colormaps have to be registered before the
+    # context is entered. Doing it here rather than at import keeps the global
+    # registry untouched unless a caller opts into the style.
+    _register_colormaps()
     # matplotlib's stubs narrow rc keys to a Literal union of every known
     # parameter name, which a plain dict[str, Any] cannot satisfy.
     return plt.rc_context(rc=cast('dict[Any, Any]', _STYLE_RCPARAMS))

@@ -163,6 +163,90 @@ gf.power(2, 3)     # → 1 (2^3 mod 7)
 
 ---
 
+## Visualization
+
+Every function takes an optional `ax` and returns it. None call `plt.show()`.
+
+```python
+from commpy import (
+    plot_constellation, plot_eye_diagram, plot_psd, plot_spectrogram,
+    plot_iq_time, plot_filter_response,
+)
+
+plot_constellation(mod, received=rx, labels=True, regions=True)
+plot_eye_diagram(waveform, sps=8)          # complex input draws I and Q
+plot_psd(waveform, fs=8.0)                 # two-sided, centered on DC
+plot_spectrogram(waveform, fs=8.0)
+plot_iq_time(waveform, fs=8.0)
+plot_filter_response(taps, fs=8.0)         # impulse + magnitude panels
+```
+
+```python
+from commpy import (
+    plot_parity_check, plot_tanner_graph, plot_trellis,
+    plot_polar_reliabilities, plot_frozen_bits, plot_interleaver,
+)
+
+plot_parity_check(ldpc)                    # sparsity + density
+plot_tanner_graph(ldpc)                    # small codes only
+plot_trellis(trellis, n_stages=4, labels=True)
+plot_polar_reliabilities(256)              # ranks, not raw scores
+plot_frozen_bits(polar)
+plot_interleaver(turbo)
+```
+
+```python
+from commpy import (
+    plot_llr_histogram, plot_decoder_convergence, plot_exit_chart,
+    plot_viterbi_paths, plot_scl_paths,
+)
+
+plot_llr_histogram(llr, bits=sent)         # bit 0 must land positive
+plot_decoder_convergence(ldpc, llr, max_iter=20)
+plot_exit_chart(rsc_trellis, snr_db=-4.0)  # snr_db is Es/N0
+plot_viterbi_paths(trellis, received)
+plot_scl_paths(llr, polar.frozen, list_size=8)
+```
+
+```python
+from commpy import (
+    plot_error_rate_comparison, plot_channel_response, plot_equalizer_response,
+    plot_ofdm_grid, plot_papr_ccdf, plot_mimo_capacity_cdf, plot_capacity_curves,
+)
+
+plot_error_rate_comparison({'uncoded': a, 'LDPC': b})   # keeps the CIs
+plot_channel_response(taps)
+plot_equalizer_response(taps, zf_equalizer(taps, 15))
+plot_ofdm_grid(grid, active_subcarriers=mod.active_subcarriers)
+plot_papr_ccdf(ofdm_symbols)
+plot_mimo_capacity_cdf(4, 4, [0, 10, 20])
+plot_capacity_curves()
+```
+
+```python
+from commpy import animate_constellation, animate_decoding, animate_viterbi
+
+anim = animate_constellation(mod, [20, 16, 12, 8])   # keep the reference!
+anim.save('sweep.gif', writer='pillow', fps=3)
+```
+
+```python
+from commpy import commpy_style, series_colors
+
+with commpy_style():        # your figures, CommPy's look
+    ...
+series_colors(3)            # first 3 slots; stable across lengths
+```
+
+Optional interactive backend — `pip install "commpy[viz]"`:
+
+```python
+from commpy import plotly_constellation, plotly_eye_diagram, plotly_psd
+from commpy import plotly_waterfall, plotly_tanner_graph
+```
+
+---
+
 ## Common Patterns
 
 ### Complete Simulation
@@ -327,13 +411,20 @@ from commpy import (
     PrimeField
 )
 
+# Visualization (~30 plot_* / animate_* functions; see API.md#visualization)
+from commpy import (
+    plot_constellation, plot_eye_diagram, plot_psd,
+    plot_tanner_graph, plot_decoder_convergence,
+    plot_error_rate_comparison, commpy_style,
+)
+
 # NumPy (required for arrays)
 import numpy as np
 
 # SciPy (required: FFT for OFDM, solve_toeplitz for MMSE equalization, ...)
 import scipy
 
-# Plotting (optional)
+# Plotting (matplotlib is a required dependency, not an optional one)
 import matplotlib.pyplot as plt
 ```
 

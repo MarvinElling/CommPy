@@ -10,8 +10,9 @@ A comprehensive guide to understanding and using CommPy's features.
 4. [Information Theory](#information-theory)
 5. [Waveform Generation](#waveform-generation)
 6. [SDR Interoperability & Link Simulation](#sdr-interoperability-link-simulation)
-7. [Practical Applications](#practical-applications)
-8. [Best Practices](#best-practices)
+7. [Visualization](#visualization)
+8. [Practical Applications](#practical-applications)
+9. [Best Practices](#best-practices)
 
 ---
 
@@ -652,6 +653,106 @@ write_sigmf('capture', symbols, sample_rate=1e6, center_freq=915e6, description=
 recovered, meta = read_sigmf('capture')
 print(meta['global']['core:sample_rate'], meta['captures'][0]['core:frequency'])
 ```
+
+---
+
+## Visualization
+
+CommPy ships around thirty plotting functions covering the signal, the code,
+the decoder, and the link. See the [API reference](API.md#visualization) for
+the full list; this section covers how to use them well.
+
+### One contract, everywhere
+
+Every plotting function has the same shape:
+
+```python
+plot_something(data, ..., ax=None) -> Axes
+```
+
+That single convention is what makes them composable. Omit `ax` and you get a
+new, styled figure. Pass one and the plot draws into your layout:
+
+```python
+import matplotlib.pyplot as plt
+from commpy import plot_constellation, plot_eye_diagram, plot_psd
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 4))
+plot_constellation(mod, received=received, ax=axes[0])
+plot_eye_diagram(waveform, sps=8, ax=axes[1])
+plot_psd(waveform, fs=8.0, ax=axes[2])
+fig.tight_layout()
+```
+
+No function calls `plt.show()`. Displaying, saving, or embedding the figure is
+your decision — which matters in scripts, in tests, and in notebooks alike.
+
+### Diagnosing a link
+
+The plots are most useful in sequence, each answering the question the previous
+one raises.
+
+1. **`plot_constellation(mod, received=rx)`** — are the clouds separated? If
+   they smear into each other, no decoder will save you.
+2. **`plot_eye_diagram(waveform, sps)`** — if the constellation is bad but the
+   SNR looks fine, the eye tells you whether pulse shaping or timing is at
+   fault. A closed eye means inter-symbol interference, not noise.
+3. **`plot_llr_histogram(llr, bits=sent)`** — the demodulator's confidence.
+   Two separated humps mean the decoder gets clean input. **If the bit-0 hump
+   sits on the negative side, an LLR sign convention is inverted somewhere** —
+   CommPy uses `L = log(P(0)/P(1))` throughout, so positive favors bit 0.
+4. **`plot_decoder_convergence(code, llr)`** — does the decoder actually
+   finish? A curve that plateaus above zero is a decoder that has stalled, not
+   one that needs more iterations.
+
+### Comparing fairly
+
+When you compare codes, compare their confidence intervals too:
+
+```python
+from commpy import plot_error_rate_comparison
+
+plot_error_rate_comparison({'uncoded': uncoded, 'LDPC': ldpc, 'polar': polar})
+```
+
+Each curve keeps the Wilson-score interval `simulate_ber` measured. Two curves
+whose error bars overlap have **not** been separated by your simulation,
+however convincing the gap between the markers looks — run more trials before
+claiming a coding gain.
+
+### Colors
+
+The palette is eight fixed hues, validated so that adjacent pairs stay
+distinguishable under protanopia, deuteranopia, and tritanopia. Two properties
+follow from assigning them in fixed slot order:
+
+- Color tracks the **entity**, not its rank. Dropping a curve from a
+  comparison never repaints the survivors, so two figures of the same data
+  stay readable side by side.
+- Past eight series, `series_colors()` warns instead of silently reusing a
+  hue. That is the point at which a figure should be split rather than
+  crowded.
+
+To give your own figures the same look:
+
+```python
+from commpy import commpy_style
+
+with commpy_style():
+    fig, ax = plt.subplots()
+    ax.plot(snr_db, throughput)
+```
+
+### Animations and interactivity
+
+`animate_constellation`, `animate_decoding`, and `animate_viterbi` return a
+`FuncAnimation` — save it as a GIF, or render it in a notebook with
+`HTML(anim.to_jshtml())`. Keep a reference to the returned object; matplotlib
+animations stop as soon as they are garbage-collected.
+
+For hover and zoom, `pip install "commpy[viz]"` adds Plotly variants of the
+five plots that benefit most (`plotly_constellation` and friends). They are
+strictly optional: `import commpy` never loads Plotly.
 
 ---
 

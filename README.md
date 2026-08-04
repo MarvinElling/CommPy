@@ -32,7 +32,8 @@ CommPy covers the classic communications-engineering stack, end to end:
 
 - **Modular by design** — each topic (coding, modulation, OFDM, info theory, queuing) is an independent subpackage; shared abstractions (`Modulator`, `FiniteField`) mean adding a new scheme reuses existing, tested machinery instead of duplicating it.
 - **Resource-efficient** — vectorized NumPy throughout; SciPy where it's a genuine win (FFT for OFDM, `solve_toeplitz` for MMSE equalization); the one inherently sequential hot loop (Viterbi decoding) gets optional Numba JIT acceleration via `pip install commpy[fast]`, with a correctness-preserving pure-Python fallback when it's not installed.
-- **Rigorously tested** — 390+ tests, including exhaustive brute-force cross-validation for algebraic decoders (BCH, Reed-Solomon), Viterbi and polar list decoding against maximum-likelihood search, and statistical BER-vs-SNR checks (coded and uncoded) against theoretical curves.
+- **Visual by default** — around thirty plotting functions covering constellations and eye diagrams, Tanner graphs and trellises, decoder convergence and EXIT charts, BER waterfalls and MIMO capacity. All share one contract (take an `ax`, return it, never call `plt.show()`), so they compose into your own figures, and one colorblind-validated palette.
+- **Rigorously tested** — 540+ tests, including exhaustive brute-force cross-validation for algebraic decoders (BCH, Reed-Solomon), Viterbi and polar list decoding against maximum-likelihood search, and statistical BER-vs-SNR checks (coded and uncoded) against theoretical curves.
 - **Fully typed** — complete type hints throughout, checked with `mypy --strict`.
 
 ## Installation
@@ -57,6 +58,12 @@ With the optional MCP server (`commpy-mcp`, for AI agents):
 
 ```bash
 pip install commpy[mcp]
+```
+
+With the optional interactive plotting backend (Plotly):
+
+```bash
+pip install commpy[viz]
 ```
 
 Or install from source:
@@ -170,6 +177,8 @@ commpy/
 ├── _channels/            # Channel impairment models (BSC, BEC, AWGN, fading, ...)
 ├── _fields/               # GF(p) and GF(2^m) arithmetic, polynomials
 ├── _informationTheory/   # Entropy, capacity, source coding, rate-distortion
+├── _mimo/                 # Rayleigh channel, Alamouti STBC, detectors, capacity
+├── _ml/                   # Optional PyTorch AI-for-wireless layer (commpy.ml)
 ├── _modulation/          # Generic M-PSK/M-QAM/M-PAM engine, legacy classes,
 │                          # pulse shaping, equalization, synchronization
 ├── _networking/          # M/M/1-family queuing models
@@ -177,6 +186,8 @@ commpy/
 ├── _sdr/                  # Raw IQ and SigMF file I/O
 ├── _simulation/           # Monte-Carlo BER/FER simulation, waterfall plotting
 ├── _utils/                # Math helpers, optional-Numba shim
+├── _viz/                  # Plotting: signals, FEC structure, decoder
+│                          # diagnostics, system/channel, animations, Plotly
 ├── _waves/                # IQ waveform synthesis and plotting
 └── __init__.py            # Public API (flat re-export; everything else is private)
 ```
@@ -189,6 +200,7 @@ Only names exported from `commpy/__init__.py` are public API; submodules (anythi
 - [`docs/API.md`](docs/API.md) — full API reference.
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — theory background and best practices.
 - [`docs/QUICK_REFERENCE.md`](docs/QUICK_REFERENCE.md) — cheat sheet.
+- [`docs/gallery.md`](docs/gallery.md) — what CommPy's plots look like.
 - [`docs/FAQ.md`](docs/FAQ.md), [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
 - [`examples/`](examples/) — runnable scripts, one per major feature plus a full-chain capstone.
 

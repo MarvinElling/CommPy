@@ -21,7 +21,8 @@ Complete API documentation for the CommPy communication engineering library.
 15. [Waveforms](#waveforms)
 16. [SDR Interoperability](#sdr-interoperability)
 17. [Link-Level Simulation](#link-level-simulation)
-18. [Utilities](#utilities)
+18. [Visualization](#visualization)
+19. [Utilities](#utilities)
 
 ---
 
@@ -1007,11 +1008,16 @@ plot_waterfall(
     result: SimulationResult,
     theoretical: Callable[[ndarray], ndarray] | None = None,
     ax: Axes | None = None,
+    *,
+    label: str = 'measured',
+    color: str | None = None,
 ) -> Axes
 ```
 
 Plots the BER/FER-vs-SNR curve (log scale) with confidence-interval error
 bars, optionally overlaid with a closed-form `theoretical` reference curve.
+Pass `label` and `color` when drawing several curves onto one `ax` — or use
+[`plot_error_rate_comparison()`](#system-channel), which does exactly that.
 
 ```python
 from commpy import Channels, MQAMModulator, plot_waterfall, simulate_ber
@@ -1021,6 +1027,132 @@ result = simulate_ber(mod, Channels.awgn, snr_db_range=[6, 8, 10, 12, 14], targe
 ax = plot_waterfall(result)
 ax.figure.show()
 ```
+
+---
+
+## Visualization
+
+Thirty-one plotting functions covering the signal, the code, the decoder, and
+the link. They all follow the same contract, the one `plot_waterfall()`
+established:
+
+```python
+plot_something(data, ..., ax: Axes | None = None) -> Axes
+```
+
+Pass an `ax` to compose into an existing figure, or omit it to get a new one.
+No function ever calls `plt.show()`, so you decide when and how the figure is
+displayed or saved.
+
+`matplotlib` is a required dependency, so everything below works out of the
+box. Only the interactive `plotly_*` variants need an extra
+(`pip install "commpy[viz]"`).
+
+### Signal & modulation
+
+| Function | Draws |
+|---|---|
+| `plot_constellation(source, *, received, labels, regions, ax)` | Constellation, optionally over a received cloud, with Gray bit labels and nearest-neighbor decision regions. `source` is a `Modulator` or an array of reference points. |
+| `plot_eye_diagram(signal, sps, *, n_traces, offset, ax)` | Eye diagram from overlaid two-symbol windows. Complex input draws I and Q separately. |
+| `plot_psd(signal, fs, *, nperseg, ax)` | Two-sided Welch power spectral density, centered on DC. |
+| `plot_spectrogram(signal, fs, *, nperseg, ax)` | Spectrum over time, with a magnitude colorbar. |
+| `plot_iq_time(signal, fs, *, ax)` | I and Q against time. |
+| `plot_filter_response(filt, *, fs, symbol_period, span, domain, ax)` | Impulse response, magnitude response, or both as stacked panels. Accepts tap arrays or the pulse-shape callables from `root_raised_cosine_filter()`. |
+
+```python
+from commpy import Channels, MQAMModulator, plot_constellation
+
+mod = MQAMModulator(16)
+symbols = mod.modulate(bits)
+received = Channels.awgn(symbols, 18.0)
+
+ax = plot_constellation(mod, received=received, labels=True, regions=True)
+ax.figure.savefig('constellation.png')
+```
+
+### FEC structure
+
+| Function | Draws |
+|---|---|
+| `plot_parity_check(source, *, ax)` | Sparsity pattern of an `H` matrix, with its measured density. Accepts `LDPCCode`, `HammingCode`, or a bare matrix. |
+| `plot_tanner_graph(source, *, ax)` | Bipartite Tanner graph, one edge per one of `H`. Best for teaching-sized codes. |
+| `plot_trellis(trellis, *, n_stages, labels, ax)` | State-transition trellis of a `Trellis` or `RSCTrellis`. Input bits differ by line style as well as color. |
+| `plot_polar_reliabilities(block_length, *, design_snr_db, ax)` | How both polar constructions rank the bit-channels — as **ranks**, since their raw scores live on incomparable scales. |
+| `plot_frozen_bits(code, *, ax)` | Frozen/information map of a `PolarCode`, folded into a rectangle. |
+| `plot_interleaver(source, *, ax)` | The permutation a `TurboCode` or `BlockInterleaver` applies. |
+
+### Decoder diagnostics
+
+| Function | Draws |
+|---|---|
+| `plot_llr_histogram(llr, *, bits, ax)` | LLR distribution, split by transmitted bit. With `bits` given, the bit-0 hump must land on the positive side — if it does not, a sign convention is inverted upstream. |
+| `plot_decoder_convergence(code, llr, *, max_iter, reference, ax)` | Errors per iteration: message bit errors with `reference`, otherwise syndrome weight. Works for `LDPCCode` and `TurboCode`. |
+| `plot_exit_chart(trellis, *, snr_db, n_points, n_bits, rng, ax)` | Extrinsic-information-transfer chart of an RSC constituent decoder, plus its mirror — the gap between them is the decoding tunnel. `snr_db` is **Es/N0**. |
+| `plot_viterbi_paths(trellis, received, *, mode, max_stages, ax)` | Viterbi survivor paths with the maximum-likelihood path highlighted. |
+| `plot_scl_paths(llr, frozen, *, list_size, ax)` | Path metrics of a polar list decoder's survivors. |
+
+```python
+from commpy import LDPCCode, MPSKModulator, Channels, plot_decoder_convergence
+
+code = LDPCCode.from_gallager(n=96, w_c=3, w_r=6)
+bpsk = MPSKModulator(2)
+codeword = code.encode(message)
+llr = bpsk.soft_demodulate(Channels.awgn(bpsk.modulate(codeword), 0.0), 1.0)
+
+plot_decoder_convergence(code, llr, max_iter=12)
+```
+
+### System & channel
+
+| Function | Draws |
+|---|---|
+| `plot_error_rate_comparison(results, *, theoretical, ax)` | Several waterfalls on one axes, each with its confidence intervals. `results` maps label → `SimulationResult`. |
+| `plot_channel_response(taps, *, fs, ax)` | Channel impulse response and the magnitude response it implies. Taps are yours to supply — the fading models in `Channels` are flat. |
+| `plot_equalizer_response(channel_taps, eq_taps, *, ax)` | Channel, equalizer, and combined magnitude responses, with residual ISI in the title. A static design plot: CommPy has no adaptive equalizer, so there is no convergence trajectory. |
+| `plot_ofdm_grid(grid, *, active_subcarriers, ax)` | Resource-grid magnitude over symbol and subcarrier, masking guard bands. |
+| `plot_papr_ccdf(ofdm_symbols, *, thresholds_db, ax)` | Complementary CDF of peak-to-average power ratio. |
+| `plot_mimo_capacity_cdf(n_tx, n_rx, snr_db, *, n_realizations, rng, ax)` | Capacity distribution over Rayleigh realizations; pass a sequence of SNRs to overlay several. |
+| `plot_capacity_curves(*, snr_db_range, ax)` | AWGN and BSC capacity limits on one shared x-axis. |
+
+### Animations
+
+Each returns a `matplotlib.animation.FuncAnimation`. Keep a reference to it —
+matplotlib animations stop the moment they are garbage-collected.
+
+| Function | Animates |
+|---|---|
+| `animate_constellation(modulator, snr_db_range, *, n_symbols, channel_fn, rng)` | A received cloud collapsing as the SNR sweeps. |
+| `animate_decoding(code, llr, *, max_iter)` | An iterative decoder's codeword settling, newly flipped bits highlighted. |
+| `animate_viterbi(trellis, received, *, mode, max_stages)` | The forward pass extending survivors, then the traceback. |
+
+```python
+from commpy import MQAMModulator, animate_constellation
+
+anim = animate_constellation(MQAMModulator(16), [20, 16, 12, 8, 4])
+anim.save('constellation.gif', writer='pillow', fps=3)   # or HTML(anim.to_jshtml())
+```
+
+### Styling
+
+| Function | Purpose |
+|---|---|
+| `commpy_style()` | Context manager applying CommPy's palette and axes chrome to *your* figures. The plotting functions do not need it. |
+| `series_colors(n)` | The first `n` categorical colors, in fixed slot order. Colors track the entity, not its rank, so dropping a curve never repaints the survivors. |
+
+The palette is eight fixed hues, validated so adjacent pairs stay separable
+under protanopia, deuteranopia, and tritanopia. Past eight series
+`series_colors()` warns rather than silently reusing a hue.
+
+### Interactive (optional)
+
+`pip install "commpy[viz]"` adds Plotly counterparts of the five plots where
+hovering and zooming pay off: `plotly_constellation()`,
+`plotly_eye_diagram()`, `plotly_psd()`, `plotly_waterfall()`, and
+`plotly_tanner_graph()`. Each returns a `plotly.graph_objects.Figure`.
+
+Plotly is imported inside the function bodies, so `import commpy` works — and
+stays fast — without the extra; calling one of these without it raises an
+`ImportError` naming the install command.
 
 ---
 

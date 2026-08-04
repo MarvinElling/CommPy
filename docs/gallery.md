@@ -36,3 +36,70 @@ one complex channel use at 15 dB — no constellation was ever specified.
 ![Autoencoder-learned 16-point constellation](images/learned_constellation.png)
 
 See [`examples/neural_autoencoder_demo.py`](https://github.com/MarvinElling/CommPy/blob/main/examples/neural_autoencoder_demo.py).
+
+## A constellation, and the decisions around it
+
+`plot_constellation()` draws the reference points, an optional cloud of
+received symbols, the Gray bit labels, and the nearest-neighbor decision
+regions — the boundaries a hard-decision demodulator actually applies.
+
+![16-QAM constellation with decision regions and bit labels](images/viz/constellation.png)
+
+```python
+from commpy import Channels, MQAMModulator, plot_constellation
+
+mod = MQAMModulator(16)
+received = Channels.awgn(mod.modulate(bits), 18.0)
+plot_constellation(mod, received=received, labels=True, regions=True)
+```
+
+## Where the inter-symbol interference shows
+
+An eye diagram overlays two-symbol windows of the pulse-shaped waveform. The
+width of the opening is the timing margin, its height the noise margin.
+
+![Eye diagram of a root-raised-cosine shaped 16-QAM signal](images/viz/eye_diagram.png)
+
+## The code, drawn
+
+An LDPC code *is* its Tanner graph: variable nodes below, parity checks above,
+one edge per one of the parity-check matrix. This is the same adjacency the
+belief-propagation decoder walks.
+
+![Tanner graph of a regular (3, 6) Gallager LDPC code](images/viz/tanner_graph.png)
+
+And a convolutional code is its trellis. Input bit 0 is solid, input bit 1
+dashed — so the two stay distinguishable in print and under color-vision
+deficiency, not only by hue.
+
+![Trellis diagram of a constraint-length-3 convolutional code](images/viz/trellis.png)
+
+## Watching a decoder work
+
+Channel LLRs split cleanly by transmitted bit when the demodulator is
+confident. The bit-0 hump sits on the positive side, following the
+library-wide convention `L = log(P(0)/P(1))`.
+
+![LLR distribution split by transmitted bit](images/viz/llr_histogram.png)
+
+Belief propagation then closes the remaining parity violations over a handful
+of iterations.
+
+![Unsatisfied parity checks falling to zero over decoder iterations](images/viz/decoder_convergence.png)
+
+Viterbi decoding keeps one survivor per state; the maximum-likelihood path is
+the one the traceback follows.
+
+![Viterbi survivor paths with the maximum-likelihood path highlighted](images/viz/viterbi_paths.png)
+
+## The limits you are working against
+
+![AWGN and BSC capacity limits against SNR](images/viz/capacity_curves.png)
+
+The gap between the two curves is the cost of hard decisions: the BSC line is
+the capacity a hard-decision BPSK receiver leaves on the table at each SNR.
+
+All nine panels come from
+[`examples/visualization_demo.py`](https://github.com/MarvinElling/CommPy/blob/main/examples/visualization_demo.py).
+Run it to see them interactively, or with `--save DIR` to regenerate the images
+above.

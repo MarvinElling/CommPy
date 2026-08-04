@@ -12,6 +12,15 @@ def test_style_applies_inside_its_context():
         assert plt.rcParams['legend.frameon'] is False
 
 
+def test_default_colormap_resolves_inside_the_context():
+    # rcParams stores image.cmap by name, so the colormap must be registered
+    # before anything inside the context asks matplotlib to resolve it.
+    with commpy_style():
+        _, ax = plt.subplots()
+        image = ax.imshow([[0.0, 1.0], [1.0, 0.0]])
+        assert image.get_cmap().name == 'commpy_sequential'
+
+
 def test_style_is_scoped_and_restores_the_previous_settings():
     before = plt.rcParams['axes.prop_cycle']
     with commpy_style():
