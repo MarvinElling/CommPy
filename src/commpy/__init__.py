@@ -135,6 +135,15 @@ from ._viz.decoding import (
     plot_viterbi_paths,
 )
 
+# Visualization: optional interactive Plotly backend (requires the `viz` extra)
+from ._viz.interactive import (
+    plotly_constellation,
+    plotly_eye_diagram,
+    plotly_psd,
+    plotly_tanner_graph,
+    plotly_waterfall,
+)
+
 # Visualization: signal- and modulation-domain plots
 from ._viz.signals import (
     plot_constellation,
@@ -254,6 +263,11 @@ __all__ = [
     'plot_trellis',
     'plot_viterbi_paths',
     'plot_waterfall',
+    'plotly_constellation',
+    'plotly_eye_diagram',
+    'plotly_psd',
+    'plotly_tanner_graph',
+    'plotly_waterfall',
     'raised_cosine_filter',
     'rate_distortion_binary',
     'rayleigh_channel_matrix',

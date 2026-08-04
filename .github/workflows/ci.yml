@@ -46,6 +46,26 @@ jobs:
       - name: Test with pytest (numba-accelerated path)
         run: pytest
 
+  test-viz-extra:
+    # Exercise the optional Plotly backend (the plotly_* functions). The base
+    # `test` job covers the complementary case: those tests skip themselves when
+    # the extra is absent, and `import commpy` must keep working without it.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package (dev + viz extras)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,viz]"
+      - name: Type-check with mypy (plotly present)
+        run: mypy
+      - name: Test the interactive backend with pytest
+        run: pytest tests/_viz
+
   test-ml-extra:
     # Exercise the optional PyTorch AI-for-wireless layer (commpy.ml). Installs
     # the CPU-only torch build to keep the job lightweight.

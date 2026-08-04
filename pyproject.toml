@@ -77,6 +77,12 @@ ml = [
 mcp = [
     "mcp>=1.0",
 ]
+# Optional interactive plotting backend (see the plotly_* functions). matplotlib
+# is a hard dependency and covers every plot; this only adds the hover/zoom
+# variants, so it stays opt-in and is imported lazily.
+viz = [
+    "plotly>=5",
+]
 dev = [
     "isort",
     "mypy",
@@ -150,6 +156,12 @@ ignore_missing_imports = true
 # mcp is an optional extra (commpy[mcp]); imported lazily in commpy.mcp_server,
 # so resolve it as missing-ok when the extra isn't installed.
 module = ["mcp.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# plotly is an optional extra (commpy[viz]); imported inside the function
+# bodies of commpy._viz.interactive, so resolve it as missing-ok without it.
+module = ["plotly.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
